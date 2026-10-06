@@ -12,7 +12,8 @@ export const NIMBO_STATES = {
   EATING: 'EATING',
   PLAYING: 'PLAYING',
   CELEBRATING: 'CELEBRATING',
-  BREAK_TIME: 'BREAK_TIME'
+  BREAK_TIME: 'BREAK_TIME',
+  IMPROVING: 'IMPROVING'
 } as const;
 
 export type NimboState = keyof typeof NIMBO_STATES;

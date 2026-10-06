@@ -11,7 +11,19 @@ import Animated, {
 } from 'react-native-reanimated';
 import { nimboController, NimboState, NIMBO_STATES } from '../services/nimboStateController';
 import { NimboBehavior } from './NimboBehavior';
-import { Cloud, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Moon, Star, Sun } from 'lucide-react-native';
+import { Image, ImageSourcePropType } from 'react-native';
+
+const NIMBO_ASSETS: Record<string, ImageSourcePropType> = {
+  BREAK_TIME: require('../assets/nimbo/nimbo-break-time.png'),
+  EATING: require('../assets/nimbo/nimbo-eating.png'),
+  ENERGETIC: require('../assets/nimbo/nimbo-energetic.png'),
+  HAPPY: require('../assets/nimbo/nimbo-happy.png'),
+  IMPROVING: require('../assets/nimbo/nimbo-improving.png'),
+  NEUTRAL: require('../assets/nimbo/nimbo-neutral.png'),
+  SLEEPING: require('../assets/nimbo/nimbo-sleeping.png'),
+  STRESSED: require('../assets/nimbo/nimbo-stressed.png'),
+  TIRED: require('../assets/nimbo/nimbo-tired.png'),
+};
 
 export function Nimbo() {
   const [state, setState] = useState<NimboState>(nimboController.getState());
@@ -20,6 +32,7 @@ export function Nimbo() {
   const translateX = useSharedValue(0);
   const scale = useSharedValue(1);
   const rotate = useSharedValue(0);
+  const opacity = useSharedValue(1);
 
   const lastTapRef = useRef<number>(0);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -144,6 +157,10 @@ export function Nimbo() {
       withTiming(0.9, { duration: 300 }),
       withTiming(1, { duration: 300 })
     );
+    opacity.value = withSequence(
+      withTiming(0.5, { duration: 300 }),
+      withTiming(1, { duration: 300 })
+    );
 
     if (newState === 'SLEEPING' || newState === 'TIRED' || newState === 'SLEEPY') {
       // Settle down
@@ -237,22 +254,55 @@ export function Nimbo() {
   };
 
   const renderAsset = () => {
+    let source: ImageSourcePropType;
     switch (state) {
-      case 'SLEEPING': return <CloudMoon size={100} color="#8b5cf6" />;
-      case 'HAPPY': return <CloudSun size={100} color="#f59e0b" />;
-      case 'ENERGETIC': return <CloudLightning size={100} color="#fbbf24" />;
+      case 'SLEEPING':
+        source = NIMBO_ASSETS.SLEEPING;
+        break;
+      case 'HAPPY':
+        source = NIMBO_ASSETS.HAPPY;
+        break;
+      case 'ENERGETIC':
+      case 'CELEBRATING':
+        source = NIMBO_ASSETS.ENERGETIC;
+        break;
+      case 'WAKING':
+        source = NIMBO_ASSETS.NEUTRAL;
+        break;
       case 'TIRED':
-      case 'SLEEPY': return <CloudFog size={100} color="#9ca3af" />;
-      case 'STRESSED': return <CloudRain size={100} color="#6b7280" />;
-      case 'WAKING': return <Sun size={100} color="#fcd34d" />;
-      case 'CELEBRATING': return <Star size={100} color="#fbbf24" />;
-      case 'BREAK_TIME': return <CloudSnow size={100} color="#93c5fd" />;
-      case 'EATING': return <Moon size={100} color="#c4b5fd" />;
-      case 'CALM': return <Cloud size={100} color="#a78bfa" />;
-      // Handle the requested IMPROVING state from the problem definition explicitly
-      case 'IMPROVING' as any: return <CloudSun size={100} color="#34d399" />;
-      default: return <Cloud size={100} color="#e5e7eb" />; // Neutral
+      case 'SLEEPY':
+        source = NIMBO_ASSETS.TIRED;
+        break;
+      case 'STRESSED':
+        source = NIMBO_ASSETS.STRESSED;
+        break;
+      case 'BREAK_TIME':
+        source = NIMBO_ASSETS.BREAK_TIME;
+        break;
+      case 'EATING':
+        source = NIMBO_ASSETS.EATING;
+        break;
+      case 'CALM':
+      case 'NEUTRAL':
+        source = NIMBO_ASSETS.NEUTRAL;
+        break;
+      case 'IMPROVING':
+        source = NIMBO_ASSETS.IMPROVING;
+        break;
+      default:
+        source = NIMBO_ASSETS.NEUTRAL;
+        break;
     }
+
+    return (
+      <View style={styles.imageMask}>
+        <Image
+          source={source}
+          style={styles.nimboImage}
+          resizeMode="contain"
+        />
+      </View>
+    );
   };
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -263,6 +313,7 @@ export function Nimbo() {
         { scale: scale.value },
         { rotate: `${rotate.value}deg` }
       ],
+      opacity: opacity.value,
     };
   });
 
@@ -300,5 +351,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#374151',
+  },
+  nimboImage: {
+    width: 200,
+    height: 180,
+    // Cropping bottom text out of the image by shifting it up if necessary
+    // or just relying on overflow: 'hidden' in imageMask
+  },
+  imageMask: {
+    width: 200,
+    height: 150,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   }
 });
