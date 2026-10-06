@@ -10,11 +10,30 @@ export default function HomeScreen() {
   const foodBalance = useStore(state => state.profile.foodBalance);
   const sleepSessions = useStore(state => state.sleepSessions);
 
+  const simulateGoingToSleep = () => {
+    nimboController.setState('SLEEPY');
+    setTimeout(() => {
+      nimboController.setState('SLEEPING');
+    }, 2000);
+  };
+
+  const simulateWakeUp = () => {
+    nimboController.setState('WAKING');
+    setTimeout(() => {
+      nimboController.setState('HAPPY'); // In real app, derived from sleep logic
+    }, 2000);
+  };
+
   const feedNimbo = () => {
     if (foodBalance > 0) {
+      const currentState = nimboController.getState();
       useStore.getState().addFood(-1);
       nimboController.setState('EATING');
-      setTimeout(() => nimboController.setState('HAPPY'), 2000);
+
+      setTimeout(() => {
+        nimboController.setState('HAPPY');
+        setTimeout(() => nimboController.setState(currentState), 2000);
+      }, 2000);
     }
   };
 
@@ -37,6 +56,16 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.button} onPress={() => router.push('/work')}>
           <Text style={styles.buttonText}>Work Schedule & Breaks</Text>
         </TouchableOpacity>
+
+        <View style={styles.row}>
+          <TouchableOpacity style={[styles.button, {flex: 1}]} onPress={simulateGoingToSleep}>
+            <Text style={styles.buttonText}>Going to Sleep</Text>
+          </TouchableOpacity>
+          <View style={{width: 10}} />
+          <TouchableOpacity style={[styles.button, {flex: 1, backgroundColor: '#f59e0b'}]} onPress={simulateWakeUp}>
+            <Text style={styles.buttonText}>I'm Awake</Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity style={[styles.button, foodBalance <= 0 && styles.buttonDisabled]} onPress={feedNimbo} disabled={foodBalance <= 0}>
           <Text style={styles.buttonText}>Feed Nimbo (Cost: 1 Food)</Text>
@@ -80,6 +109,10 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     gap: 15,
+  },
+  row: {
+    flexDirection: 'row',
+    width: '100%',
   },
   button: {
     backgroundColor: '#8b5cf6',
