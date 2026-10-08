@@ -1,0 +1,4 @@
+import http from 'node:http';import fs from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';
+const root=path.dirname(fileURLToPath(import.meta.url));
+const server=http.createServer(async(req,res)=>{try{const file=path.resolve(root,'.'+(req.url==='/'?'/index.html':new URL(req.url,'http://localhost').pathname));if(!file.startsWith(root+path.sep))throw Error();const data=await fs.readFile(file);res.writeHead(200,{'Content-Type':file.endsWith('.css')?'text/css':file.endsWith('.js')?'text/javascript':'text/html','Cache-Control':'no-store'});res.end(data);}catch{res.writeHead(404);res.end('Not found');}});
+server.listen(Number(process.env.MOONLOOM_PREVIEW_PORT||0),'127.0.0.1',()=>console.log(`Moonloom phone preview: http://localhost:${server.address().port}`));

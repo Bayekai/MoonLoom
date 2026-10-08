@@ -1,20 +1,19 @@
 import { Tabs, router, useSegments } from 'expo-router';
 import { Cloud, List, Settings } from 'lucide-react-native';
 import { useStore } from '../store/useStore';
-import { useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import { useEffect, useSyncExternalStore } from 'react';
+import { View } from 'react-native';
+import { useWorkScheduler } from '../hooks/useWorkScheduler';
+const subscribeHydration=(notify:()=>void)=>useStore.persist.onFinishHydration(notify);
 
 export default function Layout() {
+  useWorkScheduler();
   const onboarded = useStore(state => state.profile?.onboarded);
   const segments = useSegments();
-  const [mounted, setMounted] = useState(false);
+  const hydrated=useSyncExternalStore(subscribeHydration,useStore.persist.hasHydrated,()=>false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
+    if (!hydrated) return;
 
     const isAuthGroup = segments[0] === 'onboarding';
 
@@ -22,10 +21,10 @@ export default function Layout() {
     if (!onboarded && !isAuthGroup) {
       router.replace('/onboarding');
     }
-  }, [onboarded, segments, mounted]);
+  }, [onboarded, segments, hydrated]);
 
   // Don't render layout until client side state is mounted
-  if (!mounted) return <View style={{flex:1, backgroundColor: '#1e1b4b'}} />;
+  if (!hydrated) return <View style={{flex:1, backgroundColor: '#1e1b4b'}} />;
 
   return (
     <Tabs screenOptions={{

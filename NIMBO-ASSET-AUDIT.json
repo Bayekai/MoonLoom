@@ -1,0 +1,87 @@
+{
+  "source": "https://github.com/Bayekai/MoonLoom",
+  "branch": "jules-audit-and-plan-6031774214861600124",
+  "files": [
+    {
+      "name": "nimbo-break-time.png",
+      "width": 496,
+      "height": 286,
+      "colorType": 6,
+      "animated": false,
+      "githubMatch": true,
+      "gitBlob": "ffe41ec028717f9a83d0e5a788ff5f52b2ad119a"
+    },
+    {
+      "name": "nimbo-eating.png",
+      "width": 496,
+      "height": 286,
+      "colorType": 6,
+      "animated": false,
+      "githubMatch": true,
+      "gitBlob": "09f05e417283bdd9931af6dcb8e28487431d2500"
+    },
+    {
+      "name": "nimbo-energetic.png",
+      "width": 496,
+      "height": 285,
+      "colorType": 6,
+      "animated": false,
+      "githubMatch": true,
+      "gitBlob": "7f484f5ff71f2228d7ba66bfcd99d398b7ff3c8b"
+    },
+    {
+      "name": "nimbo-happy.png",
+      "width": 496,
+      "height": 285,
+      "colorType": 6,
+      "animated": false,
+      "githubMatch": true,
+      "gitBlob": "1c322ea6a9015c3483745a4bc7b60bd757ada1da"
+    },
+    {
+      "name": "nimbo-improving.png",
+      "width": 496,
+      "height": 286,
+      "colorType": 6,
+      "animated": false,
+      "githubMatch": true,
+      "gitBlob": "9f087732da266743db6f2bae6b6ffea2e72a0f03"
+    },
+    {
+      "name": "nimbo-neutral.png",
+      "width": 496,
+      "height": 285,
+      "colorType": 6,
+      "animated": false,
+      "githubMatch": true,
+      "gitBlob": "5cd82abab963fdc2f8384fd52b08bb1aca2d2f0b"
+    },
+    {
+      "name": "nimbo-sleeping.png",
+      "width": 496,
+      "height": 285,
+      "colorType": 6,
+      "animated": false,
+      "githubMatch": true,
+      "gitBlob": "0c9a3ccb167e66479d464a2077ffefe0e2693dcc"
+    },
+    {
+      "name": "nimbo-stressed.png",
+      "width": 496,
+      "height": 285,
+      "colorType": 6,
+      "animated": false,
+      "githubMatch": true,
+      "gitBlob": "ccdbc80c7f319021d456d58fd0a2f49357a2934f"
+    },
+    {
+      "name": "nimbo-tired.png",
+      "width": 496,
+      "height": 285,
+      "colorType": 6,
+      "animated": false,
+      "githubMatch": true,
+      "gitBlob": "48fff8a5466265526ca89a7c5714afc9572ed602"
+    }
+  ]
+}

@@ -31,7 +31,7 @@ export default function OnboardingScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <Cloud size={100} color="#a78bfa" style={{marginBottom: 20}} />
       <Text style={styles.header}>Welcome to Moonloom</Text>
-      <Text style={styles.sub}>I'm Nimbo. Let's find the sleep routine that actually works for you.</Text>
+      <Text style={styles.sub}>I&apos;m Nimbo. Let&apos;s find the sleep routine that actually works for you.</Text>
 
       <View style={styles.card}>
         <Text style={styles.label}>What is your primary goal?</Text>

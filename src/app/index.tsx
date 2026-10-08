@@ -5,12 +5,14 @@ import { Nimbo } from '../components/Nimbo';
 import { nimboController } from '../services/nimboStateController';
 import { SleepTrackerService } from '../services/sleepTracker';
 import { router } from 'expo-router';
+import { WorkBreakCard } from '../components/WorkBreakCard';
 
 export default function HomeScreen() {
   const foodBalance = useStore(state => state.profile.foodBalance);
   const sleepSessions = useStore(state => state.sleepSessions);
 
   const simulateGoingToSleep = () => {
+    useStore.getState().setSleeping(true);
     nimboController.setState('SLEEPY');
     setTimeout(() => {
       nimboController.setState('SLEEPING');
@@ -18,6 +20,7 @@ export default function HomeScreen() {
   };
 
   const simulateWakeUp = () => {
+    useStore.getState().setSleeping(false);
     nimboController.setState('WAKING');
     setTimeout(() => {
       nimboController.setState('HAPPY'); // In real app, derived from sleep logic
@@ -42,6 +45,7 @@ export default function HomeScreen() {
       <Text style={styles.header}>Moonloom</Text>
 
       <Nimbo />
+      <WorkBreakCard />
 
       <View style={styles.statsCard}>
         <Text style={styles.statsText}>Dry Food: {foodBalance}</Text>
@@ -63,7 +67,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
           <View style={{width: 10}} />
           <TouchableOpacity style={[styles.button, {flex: 1, backgroundColor: '#f59e0b'}]} onPress={simulateWakeUp}>
-            <Text style={styles.buttonText}>I'm Awake</Text>
+            <Text style={styles.buttonText}>I&apos;m Awake</Text>
           </TouchableOpacity>
         </View>
 

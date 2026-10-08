@@ -5,6 +5,7 @@
 Moonloom learns relationships between sleep, lifestyle, work, behavior, morning feeling, and daytime energy to help users discover personal patterns safely.
 
 ## Phase 1 MVP Application
+The local GitHub checkout includes the work-break reminder update. See [LOCAL-UPDATES.md](LOCAL-UPDATES.md) for implemented behavior, tests, privacy differences, and the interactive mobile preview commands.
 This repository implements the Moonloom mobile application using React Native and Expo. It contains the visual interface, offline persistence architecture, and state management required for Phase 1 features.
 
 ### Features Implemented:

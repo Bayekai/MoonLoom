@@ -1,4 +1,6 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
+// Set timezone in the real test process, before Jest creates VM contexts.
+process.env.TZ = 'America/New_York';
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',

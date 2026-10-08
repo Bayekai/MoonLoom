@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { defaultWork, WorkState, CoachStyle } from '../services/workCore';
 
 export type UserProfile = {
   id: string;
@@ -12,6 +13,7 @@ export type UserProfile = {
   shiftStart?: string;
   shiftEnd?: string;
   onboarded: boolean;
+  coachStyle?: CoachStyle;
 };
 
 export type SleepSession = {
@@ -67,6 +69,8 @@ interface MoonloomState {
   workBreaks: WorkBreak[];
   experiments: Experiment[];
   aiMemory: AIMemory[];
+  work: WorkState;
+  isSleeping: boolean;
 
   // Actions
   updateProfile: (updates: Partial<UserProfile>) => void;
@@ -78,6 +82,8 @@ interface MoonloomState {
   updateExperiment: (id: string, updates: Partial<Experiment>) => void;
   addMemory: (memory: AIMemory) => void;
   addFood: (amount: number) => void;
+  setWork: (work: WorkState) => void;
+  setSleeping: (isSleeping: boolean) => void;
 }
 
 export const useStore = create<MoonloomState>()(
@@ -97,6 +103,10 @@ export const useStore = create<MoonloomState>()(
       workBreaks: [],
       experiments: [],
       aiMemory: [],
+      work: defaultWork(),
+      isSleeping: false,
+      setWork: (work) => set({work}),
+      setSleeping: (isSleeping) => set({isSleeping}),
 
       updateProfile: (updates) => set((state) => ({ profile: { ...state.profile, ...updates } })),
       addSleepSession: (session) => set((state) => ({ sleepSessions: [...state.sleepSessions, session] })),
