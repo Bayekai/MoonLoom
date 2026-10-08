@@ -36,4 +36,3 @@ describe('Nimbo kit safety and playback',()=>{
     expect(shouldPlay(true,false,false,false)).toBe(false);
   });
 });
-

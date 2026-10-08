@@ -47,7 +47,7 @@ export function Nimbo({reviewKit=false,reviewState,reviewReduced=false}:{reviewK
     if(interactionTimer.current)clearTimeout(interactionTimer.current);
     cancelAnimation(opacity);
     // Frames already translate the character. No Reanimated spatial transforms.
-    opacity.set(active && !reduced ? withSequence(withTiming(0.7,{duration:80}),withTiming(1,{duration:180})) : 1);
+    opacity.value = active && !reduced ? withSequence(withTiming(0.7,{duration:80}),withTiming(1,{duration:180})) : 1;
     return ()=>{cancelAnimation(opacity);if(interactionTimer.current)clearTimeout(interactionTimer.current);};
   },[state,active,reduced,opacity]);
   // A state change or hidden screen cancels an in-flight tap and releases playback.
@@ -57,7 +57,7 @@ export function Nimbo({reviewKit=false,reviewState,reviewReduced=false}:{reviewK
     if(!active || reduced || Date.now()-lastTap.current<1000)return;
     lastTap.current=Date.now();setInteracting(true);
     cancelAnimation(opacity);
-    opacity.set(withSequence(withTiming(0.75,{duration:100}),withTiming(1,{duration:180})));
+    opacity.value = withSequence(withTiming(0.75,{duration:100}),withTiming(1,{duration:180}));
     interactionTimer.current=setTimeout(()=>setInteracting(false),280);
   };
   const index=playing && frame.state===state ? frame.index : 0;
@@ -73,4 +73,3 @@ export function Nimbo({reviewKit=false,reviewState,reviewReduced=false}:{reviewK
   </View>;
 }
 const styles=StyleSheet.create({stage:{height:200,width:'100%',alignItems:'center',justifyContent:'center'},touchArea:{alignItems:'center'},image:{width:240,height:150},frame:{position:'absolute',top:0,left:0},stateText:{marginTop:10,fontSize:16,fontWeight:'bold',color:'#374151'}});
-
