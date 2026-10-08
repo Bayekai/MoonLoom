@@ -1,0 +1,239 @@
+{
+  "version": 1,
+  "name": "Nimbo blink",
+  "productionEnabled": false,
+  "approved": false,
+  "frameOrder": [
+    "blink-01.png",
+    "blink-02.png",
+    "blink-03.png",
+    "blink-04.png",
+    "blink-05.png"
+  ],
+  "canvas": {
+    "width": 704,
+    "height": 576,
+    "colorMode": "RGBA"
+  },
+  "alignment": {
+    "anchor": "estimated middle-front-paw baseline",
+    "x": 352,
+    "y": 552,
+    "targetCharacterWidth": 512,
+    "method": "Per-pose uniform scaling by estimated body width; no anisotropic stretching; integer placement may differ by at most one pixel."
+  },
+  "source": {
+    "file": "source-sheet.png",
+    "width": 1654,
+    "height": 951,
+    "sha256": "cc3b9b8487daace572910462fc6aa66ae2a828b34fee70635e54e22db709346d"
+  },
+  "cleanup": {
+    "method": "Original-source rectangular extraction, uniform resampling and transparent padding; then remove only disconnected islands of at most 512 pixels entirely beyond a 24-pixel protected band around the main silhouette. Character pixels and nearby ambiguous fringe are untouched by cleanup. No color-keying, erosion or repainting.",
+    "remaining": "Adjacent background fringe and white flecks cannot be safely separated from pale fur/glow by color. Retained and flagged.",
+    "aiCleanupCandidate": "Built-in imagegen attempted background-only cleanup; rejected after visual inspection because artifacts remained. Final frames come from the original source."
+  },
+  "sequenceNotes": "Opening, closing and reopening poses are ordered left-to-right across top row then bottom row. Source pose/proportion drift requires artistic review; timing and runtime integration are intentionally unspecified.",
+  "frames": [
+    {
+      "file": "blink-01.png",
+      "order": 1,
+      "pose": "eyes-open",
+      "approved": false,
+      "status": "needs-artwork-repair",
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 551,
+        "height": 502
+      },
+      "sourceCharacterWidth": 522,
+      "scale": 0.9808429118773946,
+      "resize": {
+        "width": 540,
+        "height": 492
+      },
+      "offset": {
+        "x": 21,
+        "y": 59
+      },
+      "anchor": {
+        "x": 352,
+        "y": 552
+      },
+      "sha256": "a92bb373cb47e0739be7056ffb2333b3c6138193c1c50feabfc2b75f38377cdc",
+      "defects": [
+        "White/pale fringe and speckles remain adjacent to fur.",
+        "Top curl is cut by source-sheet upper edge.",
+        "Paw baseline lies at row boundary; original silhouette may be truncated."
+      ],
+      "safeCleanup": {
+        "removedComponents": 63,
+        "removedPixels": 244,
+        "protectedMainComponentPixels": 187612,
+        "minimumSeparationPixels": 24,
+        "maximumRemovedComponentPixels": 512
+      }
+    },
+    {
+      "file": "blink-02.png",
+      "order": 2,
+      "pose": "eyes-half-closed",
+      "approved": false,
+      "status": "needs-artwork-repair",
+      "sourceRect": {
+        "x": 551,
+        "y": 0,
+        "width": 545,
+        "height": 502
+      },
+      "sourceCharacterWidth": 522,
+      "scale": 0.9808429118773946,
+      "resize": {
+        "width": 535,
+        "height": 492
+      },
+      "offset": {
+        "x": 38,
+        "y": 59
+      },
+      "anchor": {
+        "x": 352,
+        "y": 552
+      },
+      "sha256": "3b5ed5d476b9f367f513b16ae8252a515464b17142546b50d76bbdf235e8f5cf",
+      "defects": [
+        "White/pale fringe and speckles remain adjacent to fur.",
+        "Top curl is cut by source-sheet upper edge.",
+        "Paw baseline lies at row boundary; original silhouette may be truncated."
+      ],
+      "safeCleanup": {
+        "removedComponents": 207,
+        "removedPixels": 1189,
+        "protectedMainComponentPixels": 191578,
+        "minimumSeparationPixels": 24,
+        "maximumRemovedComponentPixels": 512
+      }
+    },
+    {
+      "file": "blink-03.png",
+      "order": 3,
+      "pose": "eyes-closed",
+      "approved": false,
+      "status": "needs-artwork-repair",
+      "sourceRect": {
+        "x": 1096,
+        "y": 0,
+        "width": 558,
+        "height": 502
+      },
+      "sourceCharacterWidth": 534,
+      "scale": 0.9588014981273408,
+      "resize": {
+        "width": 535,
+        "height": 481
+      },
+      "offset": {
+        "x": 36,
+        "y": 70
+      },
+      "anchor": {
+        "x": 352,
+        "y": 552
+      },
+      "sha256": "9d6efc1ada2cf7f9d8c34b7e5f227c8c1b44480f25d9eef6bef763cada3a218b",
+      "defects": [
+        "White/pale fringe and speckles remain adjacent to fur.",
+        "Top curl is cut by source-sheet upper edge.",
+        "Paw baseline lies at row boundary; original silhouette may be truncated."
+      ],
+      "safeCleanup": {
+        "removedComponents": 64,
+        "removedPixels": 285,
+        "protectedMainComponentPixels": 184973,
+        "minimumSeparationPixels": 24,
+        "maximumRemovedComponentPixels": 512
+      }
+    },
+    {
+      "file": "blink-04.png",
+      "order": 4,
+      "pose": "eyes-reopening",
+      "approved": false,
+      "status": "needs-artwork-repair",
+      "sourceRect": {
+        "x": 225,
+        "y": 502,
+        "width": 605,
+        "height": 449
+      },
+      "sourceCharacterWidth": 568,
+      "scale": 0.9014084507042254,
+      "resize": {
+        "width": 545,
+        "height": 405
+      },
+      "offset": {
+        "x": 9,
+        "y": 149
+      },
+      "anchor": {
+        "x": 352,
+        "y": 552
+      },
+      "sha256": "8b08a1e15bb7c8032bdae4af61bc973d30798986123fd7b5a5eeac1a04f6bd13",
+      "defects": [
+        "White/pale fringe and speckles remain adjacent to fur.",
+        "Bottom-row pose is intrinsically wider/shorter; uniform scaling cannot correct source proportion drift.",
+        "Paws and glow meet source-sheet bottom edge; missing pixels cannot be recovered safely."
+      ],
+      "safeCleanup": {
+        "removedComponents": 130,
+        "removedPixels": 948,
+        "protectedMainComponentPixels": 156687,
+        "minimumSeparationPixels": 24,
+        "maximumRemovedComponentPixels": 512
+      }
+    },
+    {
+      "file": "blink-05.png",
+      "order": 5,
+      "pose": "eyes-open-return",
+      "approved": false,
+      "status": "needs-artwork-repair",
+      "sourceRect": {
+        "x": 830,
+        "y": 502,
+        "width": 602,
+        "height": 449
+      },
+      "sourceCharacterWidth": 557,
+      "scale": 0.9192100538599641,
+      "resize": {
+        "width": 553,
+        "height": 413
+      },
+      "offset": {
+        "x": 29,
+        "y": 141
+      },
+      "anchor": {
+        "x": 352,
+        "y": 552
+      },
+      "sha256": "d87db6799148647d2353ee5de6276dda5ed116f50e22b4263c60716b35f84440",
+      "defects": [
+        "White/pale fringe and speckles remain adjacent to fur.",
+        "Bottom-row pose is intrinsically wider/shorter; uniform scaling cannot correct source proportion drift.",
+        "Paws and glow meet source-sheet bottom edge; missing pixels cannot be recovered safely."
+      ],
+      "safeCleanup": {
+        "removedComponents": 61,
+        "removedPixels": 809,
+        "protectedMainComponentPixels": 161825,
+        "minimumSeparationPixels": 24,
+        "maximumRemovedComponentPixels": 512
+      }
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+[
+  {
+    "file": "blink-01.png",
+    "mode": "RGBA",
+    "size": [
+      704,
+      576
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "transparentPixels": 216438,
+    "partialAlphaPixels": 188905,
+    "opaquePixels": 161,
+    "alphaBounds": [
+      21,
+      59,
+      561,
+      551
+    ],
+    "canvasEdgePixels": 0
+  },
+  {
+    "file": "blink-02.png",
+    "mode": "RGBA",
+    "size": [
+      704,
+      576
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "transparentPixels": 210340,
+    "partialAlphaPixels": 195038,
+    "opaquePixels": 126,
+    "alphaBounds": [
+      38,
+      59,
+      573,
+      551
+    ],
+    "canvasEdgePixels": 0
+  },
+  {
+    "file": "blink-03.png",
+    "mode": "RGBA",
+    "size": [
+      704,
+      576
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "transparentPixels": 218939,
+    "partialAlphaPixels": 186371,
+    "opaquePixels": 194,
+    "alphaBounds": [
+      36,
+      70,
+      570,
+      551
+    ],
+    "canvasEdgePixels": 0
+  },
+  {
+    "file": "blink-04.png",
+    "mode": "RGBA",
+    "size": [
+      704,
+      576
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "transparentPixels": 247511,
+    "partialAlphaPixels": 157841,
+    "opaquePixels": 152,
+    "alphaBounds": [
+      19,
+      149,
+      554,
+      554
+    ],
+    "canvasEdgePixels": 0
+  },
+  {
+    "file": "blink-05.png",
+    "mode": "RGBA",
+    "size": [
+      704,
+      576
+    ],
+    "alphaRange": [
+      0,
+      255
+    ],
+    "transparentPixels": 241474,
+    "partialAlphaPixels": 163895,
+    "opaquePixels": 135,
+    "alphaBounds": [
+      29,
+      141,
+      563,
+      554
+    ],
+    "canvasEdgePixels": 0
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "file": "blink-01.png",
+    "changedPixels": 244,
+    "onlyDetachedPixelsCleared": true,
+    "remainingPixelsMatchSourceNormalization": true
+  },
+  {
+    "file": "blink-02.png",
+    "changedPixels": 1189,
+    "onlyDetachedPixelsCleared": true,
+    "remainingPixelsMatchSourceNormalization": true
+  },
+  {
+    "file": "blink-03.png",
+    "changedPixels": 285,
+    "onlyDetachedPixelsCleared": true,
+    "remainingPixelsMatchSourceNormalization": true
+  },
+  {
+    "file": "blink-04.png",
+    "changedPixels": 948,
+    "onlyDetachedPixelsCleared": true,
+    "remainingPixelsMatchSourceNormalization": true
+  },
+  {
+    "file": "blink-05.png",
+    "changedPixels": 809,
+    "onlyDetachedPixelsCleared": true,
+    "remainingPixelsMatchSourceNormalization": true
+  }
+]
