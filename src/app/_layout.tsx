@@ -59,6 +59,7 @@ export default function Layout() {
       />
 
       {/* Hidden routes from Tab bar */}
+      <Tabs.Screen name="nimbo-review" options={{ href: null }} />
       <Tabs.Screen name="log" options={{ href: null }} />
       <Tabs.Screen name="work" options={{ href: null }} />
       <Tabs.Screen name="onboarding" options={{ href: null }} />
