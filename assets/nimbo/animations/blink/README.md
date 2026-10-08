@@ -1,3 +1,7 @@
+# Application integration update
+
+The user explicitly enabled this blink in production despite the known defects. `approved` remains false; `productionEnabled` is true. Neutral, calm and encouraging states use the five-frame sequence; other states retain their existing artwork. The open pose holds 4.8 seconds, followed by a 400 ms blink. Preloading, reduced motion, route focus and foreground/offscreen pausing remain active. Spatial Reanimated movement is suppressed while the frame sequence plays to avoid stacking animations. Reanimated still handles opacity transitions and tap feedback. The extraction report below describes the original import and its unresolved visual defects.
+
 # Nimbo blink extraction — not approved for production
 
 Five original poses are stored as `blink-01.png` through `blink-05.png`, in reading order: top row left-to-right (open, half-closed, closed), then bottom row left-to-right (reopening, open return). `manifest.json` specifies ordering, source rectangles, normalization transforms, approval status, hashes and per-frame defects. No timing or runtime integration is added.

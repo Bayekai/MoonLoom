@@ -1,7 +1,20 @@
 import type { ImageSourcePropType } from 'react-native';
 import type { NimboState } from '../services/nimboStateController';
 import { getNimboAssetKey, NimboAssetKey } from './nimboAssets';
-export interface NimboSequence { frames: ImageSourcePropType[]; fps: number; approved: boolean; bakedMotion: boolean; }
+export interface NimboSequence { id?: string; frames: ImageSourcePropType[]; fps: number; approved: boolean; bakedMotion: boolean; developmentEnabled?: boolean; productionEnabled?: boolean; durationsMs?: number[]; }
+export const NIMBO_BLINK_SEQUENCE: NimboSequence = {
+  // User explicitly enabled production use despite the documented visual defects.
+  id: 'blink', approved: false, productionEnabled: true, developmentEnabled: true, bakedMotion: true, fps: 10,
+  // Hold the open eyes between blinks; play the five original poses once in order.
+  durationsMs: [4800, 90, 110, 90, 110],
+  frames: [
+    require('../../assets/nimbo/animations/blink/blink-01.png'),
+    require('../../assets/nimbo/animations/blink/blink-02.png'),
+    require('../../assets/nimbo/animations/blink/blink-03.png'),
+    require('../../assets/nimbo/animations/blink/blink-04.png'),
+    require('../../assets/nimbo/animations/blink/blink-05.png'),
+  ],
+};
 // All supplied masks failed visual QA. Only the explicit development review may use them.
 export const NIMBO_SEQUENCES: Record<NimboAssetKey,NimboSequence> = {
   NEUTRAL: { approved: false, bakedMotion: true, fps: 8, frames: [
@@ -90,6 +103,22 @@ export const NIMBO_SEQUENCES: Record<NimboAssetKey,NimboSequence> = {
   ] },
 };
 export const getNimboSequence=(state:NimboState)=>NIMBO_SEQUENCES[getNimboAssetKey(state)];
-export function canUseSequence(sequence:NimboSequence,review:boolean,development:boolean){return sequence.approved || (review && development);}
+export function canUseSequence(sequence:NimboSequence,review:boolean,development:boolean){return sequence.approved || sequence.productionEnabled===true || (development && (review || sequence.developmentEnabled===true));}
+export function getDisplayedNimboSequence(state:NimboState,review:boolean,development:boolean,reviewBlink=false):NimboSequence {
+  if(development && review && reviewBlink)return NIMBO_BLINK_SEQUENCE;
+  if(!review && ['NEUTRAL','CALM','ENCOURAGING'].includes(state) && canUseSequence(NIMBO_BLINK_SEQUENCE,false,development))return NIMBO_BLINK_SEQUENCE;
+  return getNimboSequence(state);
+}
+export function sequenceClock(elapsed:number,sequence:NimboSequence):{index:number;nextInMs:number} {
+  const durations=sequence.durationsMs ?? sequence.frames.map(()=>1000/sequence.fps);
+  const total=durations.reduce((sum,duration)=>sum+duration,0);
+  if(total<=0 || durations.length!==sequence.frames.length)return {index:0,nextInMs:1000};
+  let phase=Math.max(0,elapsed)%total;
+  for(let index=0;index<durations.length;index++){
+    if(phase<durations[index])return {index,nextInMs:Math.max(1,durations[index]-phase)};
+    phase-=durations[index];
+  }
+  return {index:0,nextInMs:durations[0]};
+}
 export function frameAt(elapsed:number,fps:number,count:number){return count>0?Math.floor(Math.max(0,elapsed)*fps/1000)%count:0;}
 export function shouldPlay(active:boolean,reduced:boolean,interacting:boolean,allowed:boolean){return active && !reduced && !interacting && allowed;}

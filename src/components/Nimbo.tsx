@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/immutability */
 import React, { useEffect, useRef, useState, useSyncExternalStore, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, ImageSourcePropType, Pressable, AccessibilityInfo } from 'react-native';
+import { View, Text, StyleSheet, Image, ImageSourcePropType, Pressable } from 'react-native';
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming, withSequence, withSpring, runOnJS, Easing } from 'react-native-reanimated';
 import { nimboController, NimboState } from '../services/nimboStateController';
 import { getNimboAssetKey } from './nimboAssets';
-import { canUseSequence, frameAt, getNimboSequence, shouldPlay } from './nimboSequences';
+import { canUseSequence, getDisplayedNimboSequence, sequenceClock, shouldPlay } from './nimboSequences';
 import { useNimboActivity } from '../hooks/useNimboActivity';
 import { NimboBehavior } from './NimboBehavior';
 
@@ -24,15 +24,17 @@ const NIMBO_ASSETS: Record<string, ImageSourcePropType> = {
 const subscribe = (notify: () => void) => nimboController.subscribe(() => notify());
 const snapshot = () => nimboController.getState();
 
-export function Nimbo({ reviewKit = false, reviewState, reviewReduced = false }: { reviewKit?: boolean; reviewState?: NimboState; reviewReduced?: boolean }) {
+export function Nimbo({ reviewKit = false, reviewState, reviewReduced = false, reviewBlink = false }: { reviewKit?: boolean; reviewState?: NimboState; reviewReduced?: boolean; reviewBlink?: boolean }) {
   const current = useSyncExternalStore(subscribe, snapshot, () => 'NEUTRAL' as const);
   const state = __DEV__ && reviewKit && reviewState ? reviewState : current;
-  const sequence = getNimboSequence(state);
+  const sequence = getDisplayedNimboSequence(state, reviewKit, __DEV__, reviewBlink);
+  const sequenceKey = sequence.id ?? getNimboAssetKey(state);
+  const blinking = sequence.id === 'blink';
   const allowed = canUseSequence(sequence, reviewKit, __DEV__);
   const { ref, active, reduced: systemReduced } = useNimboActivity();
   const reduced = systemReduced || (__DEV__ && reviewKit && reviewReduced);
 
-  const [frame, setFrame] = useState({ state, index: 0 });
+  const [frame, setFrame] = useState({ state, sequenceKey, index: 0 });
   const [interacting, setInteracting] = useState(false);
   const [loaded, setLoaded] = useState<string[]>([]);
 
@@ -50,16 +52,25 @@ export function Nimbo({ reviewKit = false, reviewState, reviewReduced = false }:
   const isInteracting = useRef(false);
   const isMounted = useRef(true);
 
-  const ready = sequence.frames.every((_, i) => loaded.includes(`${getNimboAssetKey(state)}:${i}`));
+  const ready = sequence.frames.every((_, i) => loaded.includes(`${sequenceKey}:${i}`));
   const playing = shouldPlay(active, reduced, interacting, allowed && ready);
 
-  // For multi-frame animation playback
+  // One clock per visible sequence. Open-eye hold uses no polling or rerenders.
   useEffect(() => {
     if (!playing) return;
     const start = Date.now();
-    const timer = setInterval(() => setFrame({ state, index: frameAt(Date.now() - start, sequence.fps, sequence.frames.length) }), 1000 / sequence.fps);
-    return () => clearInterval(timer);
-  }, [playing, state, sequence]);
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      if (stopped) return;
+      const clock = sequenceClock(Date.now() - start, sequence);
+      setFrame(previous => previous.state === state && previous.sequenceKey === sequenceKey && previous.index === clock.index
+        ? previous : { state, sequenceKey, index: clock.index });
+      timer = setTimeout(tick, clock.nextInMs);
+    };
+    tick();
+    return () => { stopped = true; clearTimeout(timer); };
+  }, [playing, state, sequence, sequenceKey]);
 
   // Sync isInteracting ref with interacting state
   useEffect(() => {
@@ -101,11 +112,12 @@ export function Nimbo({ reviewKit = false, reviewState, reviewReduced = false }:
       scheduleNextIdle(state);
     } else if (allowed || reduced) {
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-      // Reset transforms when behavior engine is disabled
-      translateY.value = withTiming(0, { duration: 300 });
-      translateX.value = withTiming(0, { duration: 300 });
-      scale.value = withTiming(1, { duration: 300 });
-      rotate.value = withTiming(0, { duration: 300 });
+      // Frame poses already move: cancel inherited spatial motion immediately.
+      [translateY, translateX, scale, rotate].forEach(cancelAnimation);
+      translateY.value = 0;
+      translateX.value = 0;
+      scale.value = 1;
+      rotate.value = 0;
     }
   }, [state, reduced, allowed, scheduleNextIdle]);
 
@@ -178,7 +190,11 @@ export function Nimbo({ reviewKit = false, reviewState, reviewReduced = false }:
       // Just standard opacity transition if using sequences
       cancelAnimation(opacity);
       opacity.value = active && !reduced ? withSequence(withTiming(0.7, { duration: 80 }), withTiming(1, { duration: 180 })) : 1;
-      return () => clearTimeout(reset);
+      return () => {
+        clearTimeout(reset);
+        cancelAnimation(opacity);
+        if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+      };
     }
 
     setInteracting(true);
@@ -265,26 +281,28 @@ export function Nimbo({ reviewKit = false, reviewState, reviewReduced = false }:
     };
   });
 
-  const index = playing && frame.state === state ? frame.index : 0;
+  const index = playing && frame.state === state && frame.sequenceKey === sequenceKey ? frame.index : 0;
   const source = allowed ? sequence.frames[index] : NIMBO_ASSETS[getNimboAssetKey(state)];
 
   return (
-    <View ref={ref} collapsable={false} style={styles.stage}>
-      <Pressable onPress={tap} accessibilityRole="button" accessibilityLabel="Pet Nimbo" style={styles.touchArea}>
-        <Animated.View style={[styles.imageMask, animatedStyle]}>
+    <View ref={ref} collapsable={false} testID="nimbo-stage" style={[styles.stage, blinking && allowed && styles.blinkStage]}>
+      <Pressable onPress={tap} accessibilityRole="button" accessibilityLabel="Pet Nimbo" style={[styles.touchArea, blinking && allowed && styles.blinkTouchArea]}>
+        <Animated.View accessible={allowed} accessibilityRole={allowed?'image':undefined} accessibilityLabel={allowed?'Nimbo, '+state.toLowerCase().replaceAll('_',' '):undefined} style={[styles.imageMask, blinking && styles.blinkMask, animatedStyle]}>
           {allowed ? (
             sequence.frames.map((asset, i) => (
               <Image
-                key={`${getNimboAssetKey(state)}:${i}`}
+                key={`${sequenceKey}:${i}`}
+                testID={`nimbo-frame-${i}`}
                 source={asset}
-                style={[styles.nimboImage, styles.frame, { opacity: index === i ? 1 : 0 }]}
+                style={[styles.nimboImage, blinking && styles.blinkImage, styles.frame, { opacity: index === i ? 1 : 0 }]}
                 resizeMode="contain"
-                accessible={index === i}
-                accessibilityElementsHidden={index !== i}
-                importantForAccessibility={index === i ? 'auto' : 'no-hide-descendants'}
+                accessible={false}
+                aria-hidden={true}
+                accessibilityElementsHidden={true}
+                importantForAccessibility="no-hide-descendants"
                 accessibilityLabel={'Nimbo, ' + state.toLowerCase().replaceAll('_', ' ')}
                 onLoad={() => {
-                  const key = `${getNimboAssetKey(state)}:${i}`;
+                  const key = `${sequenceKey}:${i}`;
                   setLoaded(previous => previous.includes(key) ? previous : [...previous, key]);
                 }}
               />
@@ -300,7 +318,7 @@ export function Nimbo({ reviewKit = false, reviewState, reviewReduced = false }:
         </Animated.View>
       </Pressable>
       <Text style={styles.stateText}>{state}</Text>
-      {__DEV__ && reviewKit && <Text testID="nimbo-playback">{playing ? 'Playing' : 'Paused'} · frame {index + 1}{reduced ? ' · reduced motion' : ''}</Text>}
+      {__DEV__ && reviewKit && <Text testID="nimbo-playback">{blinking ? 'Blink · ' : ''}{playing ? 'Playing' : 'Paused'} · frame {index + 1}{reduced ? ' · reduced motion' : ''}</Text>}
     </View>
   );
 }
@@ -335,6 +353,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
+  blinkStage: { height: 250 },
+  blinkTouchArea: { padding: 0 },
+  blinkMask: { width: 240, height: 197 },
+  blinkImage: { width: 240, height: 197 },
   frame: {
     position: 'absolute',
     top: 0,

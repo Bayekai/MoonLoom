@@ -1,7 +1,7 @@
 {
   "version": 1,
   "name": "Nimbo blink",
-  "productionEnabled": false,
+  "productionEnabled": true,
   "approved": false,
   "frameOrder": [
     "blink-01.png",
@@ -235,5 +235,27 @@
         "maximumRemovedComponentPixels": 512
       }
     }
-  ]
+  ],
+  "productionOverride": {
+    "authorized": true,
+    "reason": "User explicitly requested: Enable in production despite the known defects.",
+    "visualApproval": false
+  },
+  "application": {
+    "integrated": true,
+    "states": [
+      "NEUTRAL",
+      "CALM",
+      "ENCOURAGING"
+    ],
+    "durationsMs": [
+      4800,
+      90,
+      110,
+      90,
+      110
+    ],
+    "cycleMs": 5200,
+    "openEyesHoldMs": 4800
+  }
 }
