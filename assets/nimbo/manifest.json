@@ -1,0 +1,26 @@
+{
+  "states": [
+    "neutral",
+    "happy",
+    "energetic",
+    "tired",
+    "sleeping",
+    "stressed",
+    "eating",
+    "break-time",
+    "improving"
+  ],
+  "frameCounts": {
+    "idle": 6,
+    "happy": 8,
+    "sleep": 8,
+    "eat": 8,
+    "energetic": 8,
+    "tired": 6,
+    "stressed": 6,
+    "break-time": 8,
+    "improving": 8
+  },
+  "transparent": "approximate mask",
+  "articulatedFrames": false
+}
