@@ -45,6 +45,9 @@ export default function HomeScreen() {
       <Text style={styles.header}>Moonloom</Text>
 
       <Nimbo />
+      {__DEV__ && <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/nimbo-rive-review')} style={styles.button}>
+        <Text style={styles.buttonText}>Rive animation preview (development)</Text>
+      </TouchableOpacity>}
       <WorkBreakCard />
 
       <View style={styles.statsCard}>

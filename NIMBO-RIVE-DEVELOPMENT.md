@@ -32,7 +32,8 @@ the prepared path. TypeScript/bundling checks do not establish native binary com
 - EAS has generated Android signing credentials for this development app. The
   first cloud build failed at dependency installation: Nitro 0.37.1 was outside
   Rive 0.5.4's required `>=0.35.10 <0.37`. Nitro is now pinned to 0.36.5 and
-  strict `npm ci --dry-run --include=dev` passes. The retry is pending.
+  strict `npm ci --dry-run --include=dev` passes. The retry succeeded:
+  https://expo.dev/accounts/bayekai/projects/moonloom/builds/ccb1d94c-c129-4457-918e-14d98d97bbda
   Expo Go cannot run the Rive native module.
 - Native folders stay generated through Expo CNG. Metro recognizes `.riv` assets.
 - Expo Asset embeds the candidate in development builds and supplies a local file
@@ -108,6 +109,17 @@ view-model APIs. Offscreen activity is supplied by the existing visibility hook.
   captures pass; reduced-motion still captures match. Saved editor prototype plays.
 - Native installation, complete state behavior and production approval: pending;
   do not describe these as complete based on the setup checks above.
+
+## Android phone check
+
+1. Open the successful build link above on the Android phone and install the APK.
+2. Keep the phone and development computer on the same Wi-Fi.
+3. Start `npm run start:dev -- --port 8090 --lan` on the computer. Open MoonLoom
+   (Dev) and connect to the server URL printed by Metro. At the current setup it
+   is `http://192.168.1.2:8090`; this address can change with the network.
+4. On Home, tap **Rive animation preview (development)**. Check blink, ear/tail/chest
+   motion, reduced motion and scrolling out of view. This review does not spend
+   food or edit sleep tracking. Native visual approval is still awaiting this check.
 
 Official references: [Rive Expo setup](https://rive.app/docs/runtimes/react-native/adding-rive-to-expo),
 [Rive bones and image meshes](https://rive.app/docs/editor/manipulating-shapes/bones),
