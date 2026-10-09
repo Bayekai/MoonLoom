@@ -3,13 +3,20 @@
 ## Current status
 
 Rive native/web runtimes and Expo development-client configuration are installed.
-**There is no Nimbo `.riv` file yet. No articulated Rive animation is enabled or
-visually validated.** The supplied PNGs and reference sheets are flattened images,
+**An unapproved idle mesh prototype now exists as `nimbo-idle-candidate.riv`, with
+editable `.rev` and RML source. It is not enabled in the app.** It compiles and
+renders locally and plays in the [Rive editor](https://editor.rive.app/file/untitled/2642039).
+It preserves the original five-frame blink and adds localized ear/tail/chest mesh
+movement. Paw position remains anchored. Reduced-motion captures at 1s and 5s are
+identical. See `assets/nimbo/rive/INSPECTION.md` for limitations.
+
+The supplied PNGs and reference sheets are flattened images,
 not an editable character rig. Rive does not automatically reconstruct hidden paw,
 eyelid or mouth details. The current artwork, blink sequence, Reanimated raster
 behavior, feeding, sleep tracking and state controller remain intact.
 
-The Rive editor account and Expo build account require user sign-in. This Windows
+The Rive editor/CLI and Expo CLI are signed in. Expo project
+`@bayekai/moonloom` is linked, ID `9122c18b-b5ba-4c3c-83e9-534fb8daec83`. This Windows
 machine has no Android SDK/JDK or native emulator configured; a cloud EAS build is
 the prepared path. TypeScript/bundling checks do not establish native binary compatibility.
 
@@ -18,13 +25,22 @@ the prepared path. TypeScript/bundling checks do not establish native binary com
 - `npm run build:android:dev`: EAS internal Android development APK.
 - `npm run build:ios:simulator`: EAS iOS simulator build; running it requires macOS.
 - `npm run start:dev`: launches Metro with the development variant on Windows/macOS/Linux.
-- First authenticate with `npx eas-cli@latest login`, then initialize/link the
-  intended Expo project with `npx eas-cli@latest init` before building.
+- Expo project linking is configured. Other contributors authenticate with
+  `npx eas-cli@latest login` using an account that can access that project.
 - The development variant is `MoonLoom (Dev)`, identifier
   `com.bayekai.moonloom.dev`. Production identifiers are not changed or invented.
-- EAS project ownership, signing credentials and build output have not yet been
-  established. No APK has been produced. Expo Go cannot run the Rive native module.
+- EAS has generated Android signing credentials for this development app. The
+  first cloud build failed at dependency installation: Nitro 0.37.1 was outside
+  Rive 0.5.4's required `>=0.35.10 <0.37`. Nitro is now pinned to 0.36.5 and
+  strict `npm ci --dry-run --include=dev` passes. The retry is pending.
+  Expo Go cannot run the Rive native module.
 - Native folders stay generated through Expo CNG. Metro recognizes `.riv` assets.
+- Expo Asset embeds the candidate in development builds and supplies a local file
+  URI to native Rive. The web adapter resolves its URL through Expo Asset too.
+- `/nimbo-rive-review` is a hidden development-only review route, linked from
+  `/nimbo-review`. It previews the candidate without changing domain state or data.
+  Production keeps its original renderer. Local screenshots, editable rig source,
+  `.rev` exports and the archive kit are excluded from the EAS upload.
 
 ## Rig authoring contract
 
@@ -54,7 +70,8 @@ eye shapes, mouth, mesh distortion and pose drift on contrasting backgrounds.
 
 ## Activating a validated export
 
-1. Save the real export as `assets/nimbo/rive/nimbo.riv` and retain the editable
+1. Complete native and full animation validation of the candidate, or save a
+   replacement as `assets/nimbo/rive/nimbo.riv`, and retain the editable
    Rive project URL and artwork inspection results in the manifest.
 2. Change `NIMBO_RIVE_ASSET` from null to a **literal**
    `require('../../../assets/nimbo/rive/nimbo.riv')`. Never create an empty or sample
@@ -62,6 +79,9 @@ eye shapes, mouth, mesh distortion and pose drift on contrasting backgrounds.
 3. Validate the full contract and all states in the Rive editor, native development
    build and web renderer. Set manifest `file`, `approved` and `enabled` only after
    those checks pass.
+   Only states listed in manifest `supportedStates` use the rig; unsupported states
+   keep the original renderer. The current prototype supports idle variants only.
+   `state` and `tap` are reserved properties, not implemented character behaviors.
 4. Check foreground/offscreen pause, reduced motion, tap guards, aspect ratio,
    error fallback, feeding and sleep behavior. Test eating/sleeping without spending
    real user food or changing their saved sessions.
@@ -76,13 +96,17 @@ view-model APIs. Offscreen activity is supplied by the existing visibility hook.
 
 - TypeScript: passed.
 - ESLint: no errors; existing unused `sleepSessions` warning in Home.
-- Unit tests: 84 passed across 9 suites.
+- Unit tests: 85 passed across 9 suites.
 - Expo Doctor: 21/21 passed.
 - Web export: passed with a separate lazy Rive canvas bundle.
 - Android JavaScript export: passed, including Hermes bytecode compilation.
 - Web simulator: existing blink and breathing render; reduced motion pauses both.
+  The new Rive candidate renders in the app review route with no raster body motion;
+  reduced motion switches to the stable original pose.
 - Expo config introspection: development variant and plugins resolve.
-- Actual Rive artwork, native installation and articulated animation: pending;
+- Rive CLI 1.5.1: verified scene, no inspection problems; headless blink/mesh
+  captures pass; reduced-motion still captures match. Saved editor prototype plays.
+- Native installation, complete state behavior and production approval: pending;
   do not describe these as complete based on the setup checks above.
 
 Official references: [Rive Expo setup](https://rive.app/docs/runtimes/react-native/adding-rive-to-expo),

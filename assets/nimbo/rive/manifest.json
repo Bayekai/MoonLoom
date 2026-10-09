@@ -1,13 +1,17 @@
 {
   "version": 1,
-  "status": "awaiting-authored-and-validated-rig",
+  "status": "idle-prototype-awaiting-native-validation",
   "approved": false,
   "enabled": false,
-  "file": null,
+  "file": "nimbo-idle-candidate.riv",
   "artboard": "Nimbo",
   "stateMachine": "NimboBehavior",
   "viewModel": "NimboModel",
-  "properties": { "state": "number", "reducedMotion": "boolean", "tap": "trigger" },
+  "properties": {
+    "state": "number",
+    "reducedMotion": "boolean",
+    "tap": "trigger"
+  },
   "requirements": [
     "Preserve the approved Nimbo design and existing five-frame blink",
     "Embedded images, transparent canvas, stable scale and paw anchor",
@@ -16,5 +20,28 @@
     "Rive owns character movement; never stack raster blink or Reanimated body motion",
     "Reduced motion must show a stable pose; pause when inactive",
     "Eating and sleeping remain controlled by existing application logic"
+  ],
+  "editableFile": "nimbo-idle-candidate.rev",
+  "source": "source/scene.rml",
+  "editorUrl": "https://editor.rive.app/file/untitled/2642039",
+  "supportedStates": [
+    "NEUTRAL",
+    "CALM",
+    "ENCOURAGING"
+  ],
+  "implementedAnimations": [
+    "existing-five-frame-blink",
+    "localized-ear-mesh-motion",
+    "localized-tail-mesh-sway",
+    "localized-chest-mesh-breathing",
+    "reduced-motion-still-pose"
+  ],
+  "pendingAnimations": [
+    "happy-expression",
+    "chewing",
+    "resting-pose",
+    "paw-stretch",
+    "walking",
+    "tap-expression"
   ]
 }

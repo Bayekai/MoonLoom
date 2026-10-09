@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'expo-router';
 import { ScrollView, Text, Pressable, View, StyleSheet, Switch } from 'react-native';
 import { Nimbo } from '../components/Nimbo';
 import type { NimboState } from '../services/nimboStateController';
@@ -16,6 +17,7 @@ export default function NimboReview() {
   return <ScrollView contentContainerStyle={styles.screen}>
     <Text style={styles.title}>Nimbo animation review</Text>
     <Text>Existing artwork and blink are preserved. Rejected legacy sequences are disabled. The reference sheet is a pose guide only.</Text>
+    <Link href="/nimbo-rive-review">Preview unapproved Rive idle prototype</Link>
     <Nimbo key={`${mode}:${replay}`} reviewKit reviewState={STATES[mode]} reviewReduced={reduced} reviewBlink={mode==='idle'||mode==='tap'} reviewWalking={mode==='walking'}/>
     <View><Text>Preview reduced motion</Text><Switch accessibilityLabel="Preview reduced motion" value={reduced} onValueChange={setReduced}/></View>
     <View style={styles.buttons}>{(Object.keys(STATES) as NimboAnimationId[]).map(id=><Pressable key={id} accessibilityRole="button" onPress={()=>setMode(id)} style={[styles.button,mode===id&&styles.selected]}><Text>{LABELS[id]}</Text></Pressable>)}<Pressable accessibilityRole="button" onPress={()=>setReplay(n=>n+1)} style={styles.button}><Text>Replay behavior</Text></Pressable></View>

@@ -12,6 +12,9 @@ module.exports = ({ config }) => {
       ...(development ? { package: 'com.bayekai.moonloom.dev' } : {}),
     },
     plugins: config.plugins.map(plugin => plugin === 'expo-dev-client'
-      ? ['expo-dev-client', { addGeneratedScheme: development }] : plugin),
+      ? ['expo-dev-client', { addGeneratedScheme: development }]
+      : plugin === 'expo-asset' && development
+        ? ['expo-asset', { assets: ['./assets/nimbo/rive/nimbo-idle-candidate.riv'] }]
+        : plugin),
   };
 };

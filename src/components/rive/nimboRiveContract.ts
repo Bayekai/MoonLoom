@@ -17,6 +17,10 @@ export const NIMBO_RIVE_CONTRACT = {
 export const NIMBO_RIVE_ASSET: number | null = null;
 export const NIMBO_RIVE_APPROVED = manifest.approved && manifest.enabled;
 
+export function canUseRiveForState(state: NimboState, asset: number | null, approved: boolean) {
+  return approved && asset !== null && manifest.supportedStates.includes(state);
+}
+
 export function canTapRive(state: NimboState, active: boolean, reduced: boolean) {
   return active && !reduced && !['SLEEPING', 'SLEEPY', 'EATING'].includes(state);
 }

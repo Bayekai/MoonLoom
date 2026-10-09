@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
-import { Image, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
+import { Asset } from 'expo-asset';
 import { Alignment, Fit, Layout, useRive } from '@rive-app/react-canvas';
 import { canTapRive, NIMBO_RIVE_CONTRACT as contract, NIMBO_RIVE_STATES, type NimboRiveViewProps } from './nimboRiveContract';
 
 // Metro selects the .native adapter on Android/iOS; this canvas adapter is web only.
 export default function NimboRiveView({ asset, state, active, reduced, onFailure }: NimboRiveViewProps) {
   const { rive, RiveComponent } = useRive({
-    src: Image.resolveAssetSource(asset).uri, artboard: contract.artboard,
+    src: Asset.fromModule(asset).uri, artboard: contract.artboard,
     stateMachines: contract.stateMachine, autoplay: false, autoBind: true,
     layout: new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
     onLoadError: onFailure,

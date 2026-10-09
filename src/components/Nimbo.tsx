@@ -6,7 +6,7 @@ import { getNimboAssetKey } from './nimboAssets';
 import { canUseSequence, getDisplayedNimboSequence, sequenceClock, shouldPlay } from './nimboSequences';
 import { useNimboActivity } from '../hooks/useNimboActivity';
 import { useNimboMotion } from '../hooks/useNimboMotion';
-import { NIMBO_RIVE_APPROVED, NIMBO_RIVE_ASSET } from './rive/nimboRiveContract';
+import { canUseRiveForState, NIMBO_RIVE_APPROVED, NIMBO_RIVE_ASSET } from './rive/nimboRiveContract';
 const RiveCharacter = lazy(() => import('./rive/NimboRiveCharacter'));
 
 class RiveFallback extends React.Component<{ fallback: React.ReactNode; children: React.ReactNode }, { failed: boolean }> {
@@ -20,10 +20,11 @@ interface NimboProps {
 }
 
 export function Nimbo(props: NimboProps): React.JSX.Element {
+  const state = useSyncExternalStore(subscribe, snapshot, snapshot);
   const fallback = <RasterNimbo {...props} />;
   // Import native Nitro code only once a real, reviewed rig is available.
   // Review routes retain the existing raster sequence inspection tools.
-  if (!NIMBO_RIVE_APPROVED || NIMBO_RIVE_ASSET === null || props.reviewKit) return fallback;
+  if (!canUseRiveForState(state, NIMBO_RIVE_ASSET, NIMBO_RIVE_APPROVED) || NIMBO_RIVE_ASSET === null || props.reviewKit) return fallback;
   return <RiveFallback fallback={fallback}><Suspense fallback={fallback}>
     <RiveCharacter asset={NIMBO_RIVE_ASSET} fallback={fallback} />
   </Suspense></RiveFallback>;

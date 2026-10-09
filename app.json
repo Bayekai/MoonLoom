@@ -25,7 +25,15 @@
       "expo-router",
       "expo-status-bar",
       "expo-notifications",
-      "expo-dev-client"
-    ]
+      "expo-dev-client",
+      "expo-asset"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "9122c18b-b5ba-4c3c-83e9-534fb8daec83"
+      }
+    },
+    "owner": "bayekai"
   }
 }

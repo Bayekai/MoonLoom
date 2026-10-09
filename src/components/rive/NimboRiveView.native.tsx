@@ -1,10 +1,18 @@
 import React, { useEffect } from 'react';
-import { Image, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
+import { useAssets } from 'expo-asset';
 import { Fit, RiveView, useRive, useRiveFile, useViewModelInstance } from '@rive-app/react-native';
 import { canTapRive, NIMBO_RIVE_CONTRACT as contract, NIMBO_RIVE_STATES, type NimboRiveViewProps } from './nimboRiveContract';
 
-export default function NimboRiveView({ asset, state, active, reduced, onFailure }: NimboRiveViewProps) {
-  const { riveFile, error } = useRiveFile(Image.resolveAssetSource(asset).uri);
+export default function NimboRiveView(props: NimboRiveViewProps) {
+  const [assets, error] = useAssets(props.asset);
+  const { onFailure } = props;
+  useEffect(() => { if (error) onFailure(); }, [error, onFailure]);
+  return assets ? <LoadedRive {...props} uri={assets[0].localUri ?? assets[0].uri}/> : null;
+}
+
+function LoadedRive({ uri, state, active, reduced, onFailure }: NimboRiveViewProps & { uri: string }) {
+  const { riveFile, error } = useRiveFile({ uri });
   const { instance, error: bindingError, isLoading } = useViewModelInstance(riveFile, {
     async: true, viewModelName: contract.viewModel,
   });

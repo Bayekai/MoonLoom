@@ -1,0 +1,8 @@
+name: nimbo-idle-candidate
+main: "Nimbo"
+push:
+  projectId: 2016958
+  fileId: 2642039
+logs:
+  file: build/rive.log
+  problems: build/problems.log
