@@ -115,8 +115,8 @@ view-model APIs. Offscreen activity is supplied by the existing visibility hook.
 1. Open the successful build link above on the Android phone and install the APK.
 2. Keep the phone and development computer on the same Wi-Fi.
 3. Start `npm run start:dev -- --port 8090 --lan` on the computer. Open MoonLoom
-   (Dev) and connect to the server URL printed by Metro. At the current setup it
-   is `http://192.168.1.2:8090`; this address can change with the network.
+   (Dev) and connect to the server URL printed by Metro. Use the computer's
+   current Wi-Fi address; this address can change with the network.
 4. On Home, tap **Rive animation preview (development)**. Check blink, ear/tail/chest
    motion, reduced motion and scrolling out of view. This review does not spend
    food or edit sleep tracking. Native visual approval is still awaiting this check.
