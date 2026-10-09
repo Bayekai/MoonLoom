@@ -1,0 +1,78 @@
+import type { NimboState } from '../services/nimboStateController';
+
+export type NimboAnimationId = 'idle' | 'happy' | 'eating' | 'sleeping' | 'wake' | 'walking' | 'tap';
+export interface NimboAnimationDefinition {
+  id: NimboAnimationId;
+  status: 'partial' | 'awaiting-approved-artwork';
+  visualNow: string;
+  wholeCharacterMovement: boolean;
+  artwork: {
+    status: 'awaiting-approved-artwork';
+    enabled: false;
+    expectedFrames: number;
+    frameOrder: readonly string[];
+    canvas: { width: 704; height: 576 };
+    requiredDetails: readonly string[];
+  };
+  phases: readonly { name: string; durationMs: number; requiresArtwork: boolean }[];
+  completion: string;
+}
+
+const pending = (expectedFrames: number, requiredDetails: string[]): NimboAnimationDefinition['artwork'] => ({
+  status: 'awaiting-approved-artwork', enabled: false, expectedFrames,
+  // No fake file names or require() calls for drawings that have not been delivered.
+  frameOrder: [], canvas: { width: 704, height: 576 }, requiredDetails,
+});
+
+export const NIMBO_ANIMATION_DEFINITIONS: Record<NimboAnimationId, NimboAnimationDefinition> = {
+  idle: {
+    id: 'idle', status: 'partial', visualNow: 'Existing blink plus gentle whole-character breathing.', wholeCharacterMovement: true,
+    artwork: pending(6, ['Independent ears and tail with clean body plates and pivot points, or aligned painted ear/tail poses.']),
+    phases: [{ name: 'breathe-in', durationMs: 2200, requiresArtwork: false }, { name: 'breathe-out', durationMs: 2200, requiresArtwork: false }, { name: 'ear-and-tail-articulation', durationMs: 4400, requiresArtwork: true }],
+    completion: 'Loop breathing independently of the unchanged blink clock.',
+  },
+  happy: {
+    id: 'happy', status: 'partial', visualNow: 'Existing smiling pose and two short whole-character celebratory hops.', wholeCharacterMovement: true,
+    artwork: pending(6, ['Aligned facial smile transitions; independent paw/ear/tail celebration poses.']),
+    phases: [{ name: 'celebrate', durationMs: 720, requiresArtwork: false }, { name: 'smile-transition', durationMs: 300, requiresArtwork: true }],
+    completion: 'Keep the current domain state; resume gentle breathing after the finite celebration.',
+  },
+  eating: {
+    id: 'eating', status: 'partial', visualNow: 'Existing static eating/bowl pose and unchanged feeding state flow; no fake chewing.', wholeCharacterMovement: false,
+    artwork: pending(6, ['Separate fixed bowl and character, or aligned approach frames.', 'Head-lowering and chewing mouth/jaw poses with clean body plates.', 'Return-to-idle pose matching the existing neutral character.']),
+    phases: [{ name: 'approach-bowl', durationMs: 500, requiresArtwork: true }, { name: 'lower-head', durationMs: 350, requiresArtwork: true }, { name: 'chew', durationMs: 1100, requiresArtwork: true }, { name: 'return-to-idle', durationMs: 450, requiresArtwork: true }],
+    completion: 'Existing feeding logic owns food spending and the EATING → HAPPY → prior-state transition.',
+  },
+  sleeping: {
+    id: 'sleeping', status: 'partial', visualNow: 'Existing closed-eye resting pose, a small whole-character settle and slow breathing.', wholeCharacterMovement: true,
+    artwork: pending(6, ['Aligned curl/settle body and tail poses.', 'Eye-closing frames that match the resting pose; do not stretch awake blink frames into a sleeping face.']),
+    phases: [{ name: 'settle', durationMs: 600, requiresArtwork: false }, { name: 'curl-and-close-eyes', durationMs: 700, requiresArtwork: true }, { name: 'sleep-breath', durationMs: 6000, requiresArtwork: false }],
+    completion: 'Remain SLEEPING until the existing wake action changes the controller.',
+  },
+  wake: {
+    id: 'wake', status: 'partial', visualNow: 'Existing open-eye pose and a brief whole-character wake lift; no independent paw stretch.', wholeCharacterMovement: true,
+    artwork: pending(6, ['Eye-opening poses matched to the sleeping character.', 'Independent front-paw stretch and body-extension poses.', 'Return pose aligned to the existing neutral artwork.']),
+    phases: [{ name: 'wake-lift', durationMs: 650, requiresArtwork: false }, { name: 'open-eyes-and-stretch-paws', durationMs: 900, requiresArtwork: true }, { name: 'return-normal', durationMs: 350, requiresArtwork: true }],
+    completion: 'Existing wake flow owns WAKING → HAPPY; the visual layer never edits sleep records.',
+  },
+  walking: {
+    id: 'walking', status: 'awaiting-approved-artwork', visualNow: 'Static preview only. Translating a fixed paw pose is not walking.', wholeCharacterMovement: false,
+    artwork: pending(8, ['Alternating front/back paw contact and lift poses.', 'Coordinated body weight shift and stable ground-contact baseline.', 'Clean silhouette with no background/text and consistent character proportions.']),
+    phases: [{ name: 'left-contact', durationMs: 160, requiresArtwork: true }, { name: 'left-pass', durationMs: 160, requiresArtwork: true }, { name: 'right-contact', durationMs: 160, requiresArtwork: true }, { name: 'right-pass', durationMs: 160, requiresArtwork: true }],
+    completion: 'No runtime gait is enabled until approved frames or articulated layers exist.',
+  },
+  tap: {
+    id: 'tap', status: 'partial', visualNow: 'Brief whole-character recoil followed by the existing happy pose and a small hop. Surprised face is pending.', wholeCharacterMovement: true,
+    artwork: pending(6, ['A true surprised eye/mouth pose.', 'Aligned surprise → smile → neutral facial/body transitions.']),
+    phases: [{ name: 'recoil', durationMs: 180, requiresArtwork: false }, { name: 'surprised-expression', durationMs: 180, requiresArtwork: true }, { name: 'happy-response', durationMs: 720, requiresArtwork: false }, { name: 'return', durationMs: 100, requiresArtwork: false }],
+    completion: 'Return to the current controller state without consuming food or changing sleep/work data.',
+  },
+};
+
+export function animationForState(state: NimboState): NimboAnimationId {
+  if (state === 'EATING') return 'eating';
+  if (state === 'SLEEPING') return 'sleeping';
+  if (state === 'WAKING') return 'wake';
+  if (['HAPPY', 'ENERGETIC', 'CELEBRATING', 'IMPROVING'].includes(state)) return 'happy';
+  return 'idle';
+}

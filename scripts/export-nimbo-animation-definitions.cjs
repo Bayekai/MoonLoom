@@ -1,0 +1,14 @@
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const crypto=require('node:crypto');
+const root=path.resolve(__dirname,'..');
+const ts=require(path.join(root,'node_modules/typescript'));
+const source=fs.readFileSync(path.join(root,'src/components/nimboAnimationDefinitions.ts'),'utf8');
+const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const exported={};
+vm.runInNewContext(compiled,{exports:exported});
+const reference=fs.readFileSync(path.join(root,'assets/nimbo/reference/animation-behavior-reference.png'));
+const manifest={version:1,reference:{file:'reference/animation-behavior-reference.png',role:'reference-only; never cropped or loaded as a production sprite',sha256:crypto.createHash('sha256').update(reference).digest('hex')},definitionSource:'src/components/nimboAnimationDefinitions.ts',blink:'Existing blink files, order, approval flags and cadence are unchanged.',artworkPlaybackEnabled:false,animations:exported.NIMBO_ANIMATION_DEFINITIONS};
+fs.writeFileSync(path.join(root,'assets/nimbo/animation-definitions.json'),JSON.stringify(manifest,null,2)+'\n');
+console.log('Exported animation definitions; all missing artwork remains disabled.');

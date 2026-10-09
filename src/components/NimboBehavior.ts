@@ -1,8 +1,44 @@
 import { NimboState } from '../services/nimboStateController';
+import { animationForState, NIMBO_ANIMATION_DEFINITIONS } from './nimboAnimationDefinitions';
+
+export interface NimboMotionProfile {
+  breathScale: number;
+  breathHalfCycleMs: number;
+  entry: 'none' | 'celebrate' | 'settle' | 'wake';
+}
+const IDLE: NimboMotionProfile = { breathScale: 1.012, breathHalfCycleMs: 2200, entry: 'none' };
+const HAPPY: NimboMotionProfile = { ...IDLE, entry: 'celebrate' };
+const SLEEP: NimboMotionProfile = { breathScale: 1.008, breathHalfCycleMs: 3000, entry: 'settle' };
+const WAKE: NimboMotionProfile = { ...IDLE, entry: 'wake' };
+const EATING: NimboMotionProfile = { breathScale: 1, breathHalfCycleMs: 2200, entry: 'none' };
+const TIRED: NimboMotionProfile = { breathScale: 1.009, breathHalfCycleMs: 2700, entry: 'none' };
 
 type IdleEvent = 'breathe' | 'float' | 'tilt' | 'hop' | 'settle' | 'none';
 
 export class NimboBehavior {
+  static getMotionProfile(state: NimboState): NimboMotionProfile {
+    if (state === 'TIRED' || state === 'SLEEPY') return TIRED;
+    switch (animationForState(state)) {
+      case 'happy': return HAPPY;
+      case 'sleeping': return SLEEP;
+      case 'wake': return WAKE;
+      case 'eating': return EATING;
+      default: return IDLE;
+    }
+  }
+
+  static getAnimationDefinition(state: NimboState) {
+    return NIMBO_ANIMATION_DEFINITIONS[animationForState(state)];
+  }
+
+  static canAnimate(active: boolean, reduced: boolean, ownsSpatialMotion: boolean) {
+    return active && !reduced && !ownsSpatialMotion;
+  }
+
+  static canReactToTap(state: NimboState) {
+    return !['SLEEPING', 'SLEEPY', 'EATING'].includes(state);
+  }
+
   static getNextIdleEvent(state: NimboState): IdleEvent {
     const r = Math.random();
     switch (state) {

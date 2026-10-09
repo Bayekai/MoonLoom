@@ -17,7 +17,7 @@ describe('Nimbo kit safety and playback',()=>{
     for(const frame of sequence.frames)expect(fs.existsSync(frame as string)).toBe(true);
     expect(canUseSequence(sequence,false,true)).toBe(false);
     expect(canUseSequence(sequence,true,false)).toBe(false);
-    expect(canUseSequence(sequence,true,true)).toBe(true);
+    expect(canUseSequence(sequence,true,true)).toBe(false);
   });
   test('manifest counts match every sequence',()=>{
     const manifest=JSON.parse(fs.readFileSync(path.resolve(root,'../manifest.json'),'utf8'));

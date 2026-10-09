@@ -103,7 +103,8 @@ export const NIMBO_SEQUENCES: Record<NimboAssetKey,NimboSequence> = {
   ] },
 };
 export const getNimboSequence=(state:NimboState)=>NIMBO_SEQUENCES[getNimboAssetKey(state)];
-export function canUseSequence(sequence:NimboSequence,review:boolean,development:boolean){return sequence.approved || sequence.productionEnabled===true || (development && (review || sequence.developmentEnabled===true));}
+// Rejected legacy loops remain disabled even in the review screen. Blink keeps its explicit opt-in.
+export function canUseSequence(sequence:NimboSequence,_review:boolean,development:boolean){return sequence.approved || sequence.productionEnabled===true || (development && sequence.developmentEnabled===true);}
 export function getDisplayedNimboSequence(state:NimboState,review:boolean,development:boolean,reviewBlink=false):NimboSequence {
   if(development && review && reviewBlink)return NIMBO_BLINK_SEQUENCE;
   if(!review && ['NEUTRAL','CALM','ENCOURAGING'].includes(state) && canUseSequence(NIMBO_BLINK_SEQUENCE,false,development))return NIMBO_BLINK_SEQUENCE;
