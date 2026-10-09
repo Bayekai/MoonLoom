@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useSyncExternalStore } from 'react';
+import React, { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react';
 import { View, Text, StyleSheet, Image, ImageSourcePropType, Pressable } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { nimboController, NimboState } from '../services/nimboStateController';
@@ -6,6 +6,28 @@ import { getNimboAssetKey } from './nimboAssets';
 import { canUseSequence, getDisplayedNimboSequence, sequenceClock, shouldPlay } from './nimboSequences';
 import { useNimboActivity } from '../hooks/useNimboActivity';
 import { useNimboMotion } from '../hooks/useNimboMotion';
+import { NIMBO_RIVE_APPROVED, NIMBO_RIVE_ASSET } from './rive/nimboRiveContract';
+const RiveCharacter = lazy(() => import('./rive/NimboRiveCharacter'));
+
+class RiveFallback extends React.Component<{ fallback: React.ReactNode; children: React.ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() { return this.state.failed ? this.props.fallback : this.props.children; }
+}
+
+interface NimboProps {
+  reviewKit?: boolean; reviewState?: NimboState; reviewReduced?: boolean; reviewBlink?: boolean; reviewWalking?: boolean;
+}
+
+export function Nimbo(props: NimboProps): React.JSX.Element {
+  const fallback = <RasterNimbo {...props} />;
+  // Import native Nitro code only once a real, reviewed rig is available.
+  // Review routes retain the existing raster sequence inspection tools.
+  if (!NIMBO_RIVE_APPROVED || NIMBO_RIVE_ASSET === null || props.reviewKit) return fallback;
+  return <RiveFallback fallback={fallback}><Suspense fallback={fallback}>
+    <RiveCharacter asset={NIMBO_RIVE_ASSET} fallback={fallback} />
+  </Suspense></RiveFallback>;
+}
 const NIMBO_ASSETS: Record<string, ImageSourcePropType> = {
   BREAK_TIME: require('../assets/nimbo/nimbo-break-time.png'),
   EATING: require('../assets/nimbo/nimbo-eating.png'),
@@ -22,9 +44,7 @@ const NIMBO_ASSETS: Record<string, ImageSourcePropType> = {
 const subscribe = (notify: () => void) => nimboController.subscribe(() => notify());
 const snapshot = () => nimboController.getState();
 
-export function Nimbo({ reviewKit = false, reviewState, reviewReduced = false, reviewBlink = false, reviewWalking = false }: {
-  reviewKit?: boolean; reviewState?: NimboState; reviewReduced?: boolean; reviewBlink?: boolean; reviewWalking?: boolean;
-}) {
+function RasterNimbo({ reviewKit = false, reviewState, reviewReduced = false, reviewBlink = false, reviewWalking = false }: NimboProps): React.JSX.Element {
   const current = useSyncExternalStore(subscribe, snapshot, () => 'NEUTRAL' as const);
   const state = __DEV__ && reviewKit && reviewState ? reviewState : current;
   const sequence = getDisplayedNimboSequence(state, reviewKit, __DEV__, reviewBlink);

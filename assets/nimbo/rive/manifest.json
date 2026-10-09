@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "status": "awaiting-authored-and-validated-rig",
+  "approved": false,
+  "enabled": false,
+  "file": null,
+  "artboard": "Nimbo",
+  "stateMachine": "NimboBehavior",
+  "viewModel": "NimboModel",
+  "properties": { "state": "number", "reducedMotion": "boolean", "tap": "trigger" },
+  "requirements": [
+    "Preserve the approved Nimbo design and existing five-frame blink",
+    "Embedded images, transparent canvas, stable scale and paw anchor",
+    "Articulated paws, eyelids, mouth, ears and tail must pass visual review",
+    "No reference-sheet thumbnail crops or rejected legacy sequences",
+    "Rive owns character movement; never stack raster blink or Reanimated body motion",
+    "Reduced motion must show a stable pose; pause when inactive",
+    "Eating and sleeping remain controlled by existing application logic"
+  ]
+}
