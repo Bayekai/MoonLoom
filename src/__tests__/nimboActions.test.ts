@@ -72,4 +72,25 @@ describe('Nimbo user action timing', () => {
     expect(nimboActions.interact('encourage')).toBe(false);
     expect(nimboController.getState()).toBe('EATING');
   });
+
+  it('rapidly changing social actions restores the original emotion', () => {
+    nimboController.setState('STRESSED');
+    nimboActions.interact('play');
+    jest.advanceTimersByTime(100);
+    nimboActions.interact('comfort');
+    jest.advanceTimersByTime(100);
+    nimboActions.interact('encourage');
+    jest.runAllTimers();
+    expect(nimboController.getState()).toBe('STRESSED');
+    expect(useStore.getState().profile.foodBalance).toBe(3);
+  });
+
+  it('feeding during play returns to the original emotion', () => {
+    nimboController.setState('TIRED');
+    nimboActions.interact('play');
+    nimboActions.feed();
+    jest.runAllTimers();
+    expect(nimboController.getState()).toBe('TIRED');
+    expect(useStore.getState().profile.foodBalance).toBe(2);
+  });
 });

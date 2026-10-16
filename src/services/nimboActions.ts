@@ -5,11 +5,13 @@ import { nimboController, type NimboState } from './nimboStateController';
 class NimboActions {
   private timer: ReturnType<typeof setTimeout> | undefined;
   private feeding = false;
+  private social: { base: NimboState; current: NimboState } | undefined;
 
   private cancel() {
     clearTimeout(this.timer);
     this.timer = undefined;
     this.feeding = false;
+    this.social = undefined;
   }
 
   reset() {
@@ -44,10 +46,15 @@ class NimboActions {
     const previous = nimboController.getState();
     if (this.feeding || store.isSleeping || store.work.runtime.timer ||
         ['EATING', 'SLEEPY', 'SLEEPING', 'WAKING'].includes(previous)) return false;
+    const base = this.social?.current === previous ? this.social.base : previous;
     this.cancel();
     const next = { play: 'PLAYING', comfort: 'CALM', encourage: 'ENCOURAGING' } as const;
+    this.social = { base, current: next[kind] };
     nimboController.setState(next[kind]);
-    this.after(next[kind], () => nimboController.setState(previous));
+    this.after(next[kind], () => {
+      this.social = undefined;
+      nimboController.setState(base);
+    });
     return true;
   }
 
@@ -55,7 +62,8 @@ class NimboActions {
     const store = useStore.getState();
     if (this.feeding || store.isSleeping || store.profile.foodBalance < 1) return false;
     const current = nimboController.getState();
-    const previous = current === 'WAKING' ? 'HAPPY' : current;
+    const previous = current === 'WAKING' ? 'HAPPY'
+      : this.social?.current === current ? this.social.base : current;
     this.cancel();
     this.feeding = true;
     store.addFood(-1);
