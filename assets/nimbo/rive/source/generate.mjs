@@ -67,9 +67,9 @@ ${layer('Gentle mesh idle',13,15,8,10)}
 </StateMachine>
 <LinearAnimation name="Blink" id="0:6" fps="100" duration="520" loopValue="loop"><KeyedObject objectId="0:20"><KeyedProperty propertyKey="296">${[[0,300],[480,301],[489,302],[500,303],[509,304],[520,300]].map(([frame,id])=>`<KeyFrameId frame="${frame}" value="0:${id}"/>`).join('')}</KeyedProperty></KeyedObject></LinearAnimation>
 <LinearAnimation name="Mesh idle" id="0:8" fps="60" duration="264" loopValue="loop">
-${animation(101,15,[[0,0],[66,-.018],[132,0],[198,.012],[264,0]])}
-${animation(102,15,[[0,0],[66,.014],[132,0],[198,-.01],[264,0]])}
-${animation(103,15,[[0,0],[66,-.024],[132,0],[198,.024],[264,0]])}
+${animation(101,15,[[0,0],[66,-.09],[132,0],[198,.06],[264,0]])}
+${animation(102,15,[[0,0],[66,.07],[132,0],[198,-.05],[264,0]])}
+${animation(103,15,[[0,0],[66,-.14],[132,0],[198,.14],[264,0]])}
 ${animation(104,17,[[0,1],[132,1.025],[264,1]])}
 </LinearAnimation>
 <LinearAnimation name="Still eyes" id="0:9" duration="1"><KeyedObject objectId="0:20"><KeyedProperty propertyKey="296"><KeyFrameId frame="0" value="0:300"/></KeyedProperty></KeyedObject></LinearAnimation>

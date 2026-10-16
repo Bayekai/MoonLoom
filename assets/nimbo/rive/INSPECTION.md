@@ -39,8 +39,14 @@ There are no fabricated anatomical layers or reference-sheet sprite crops.
 - Web Rive renders this candidate in MoonLoom's isolated development review route.
   Reduced motion switches to the stable original pose. The candidate and raster
   body engines are mutually exclusive.
-- Native Rive rendering and binary compatibility remain untested until an Expo
-  development build is installed. Web results do not establish native results.
+- The Android development build is installed. The user reports blinking with
+  “Rive candidate active”, but could not see the original small ear/tail motion.
+  Native mesh movement is still awaiting confirmation.
+- Increased ear rotation peaks to -0.09/0.06 and 0.07/-0.05 radians and tail
+  rotation to ±0.14 radians for visibility at the 240 × 197 display size.
+  Local CLI captures at 0s and 1.1s show ear and tail changes; the paw-floor
+  band still differs at only one pixel by one channel value. Reduced-motion
+  captures at 1s/5s retain the identical SHA-256 recorded above.
 - Manifest `approved` and `enabled` remain false; static production mapping remains
   null. The original Nimbo renderer, blink, feeding and sleep behavior stay active.
 
