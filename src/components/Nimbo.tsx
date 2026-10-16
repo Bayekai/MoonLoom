@@ -6,6 +6,7 @@ import { getNimboAssetKey } from './nimboAssets';
 import { canUseSequence, getDisplayedNimboSequence, sequenceClock, shouldPlay } from './nimboSequences';
 import { useNimboActivity } from '../hooks/useNimboActivity';
 import { useNimboMotion } from '../hooks/useNimboMotion';
+import { NIMBO_EMOTIONS } from './nimboEmotions';
 import { canUseRiveForState, NIMBO_RIVE_APPROVED, NIMBO_RIVE_ASSET } from './rive/nimboRiveContract';
 const RiveCharacter = lazy(() => import('./rive/NimboRiveCharacter'));
 
@@ -57,6 +58,12 @@ function RasterNimbo({ reviewKit = false, reviewState, reviewReduced = false, re
   const [frame, setFrame] = useState({ state, sequenceKey, index: 0 });
   const [loaded, setLoaded] = useState<string[]>([]);
   const [happyLoaded, setHappyLoaded] = useState(false);
+  const [response, setResponse] = useState<{ state: NimboState; text: string } | null>(null);
+  useEffect(() => {
+    if (!response) return;
+    const timer = setTimeout(() => setResponse(null), 4200);
+    return () => clearTimeout(timer);
+  }, [response]);
   const walkingPending = __DEV__ && reviewKit && reviewWalking;
   const motion = useNimboMotion(state, active, reduced, walkingPending || (allowed && !blinking && sequence.bakedMotion));
   const ready = sequence.frames.every((_, i) => loaded.includes(sequenceKey + ':' + i));
@@ -82,7 +89,11 @@ function RasterNimbo({ reviewKit = false, reviewState, reviewReduced = false, re
   const respondingHappy = happyLoaded && motion.tapPhase === 'happy';
   const label = respondingHappy ? 'Nimbo, happy response' : 'Nimbo, ' + state.toLowerCase().replaceAll('_', ' ');
   return <View ref={ref} collapsable={false} testID="nimbo-stage" style={[styles.stage, blinking && allowed && styles.blinkStage, __DEV__ && reviewKit && styles.reviewStage]}>
-    <Pressable onPress={() => { if (happyLoaded) motion.tap(); }} accessibilityRole="button" accessibilityLabel="Pet Nimbo" style={[styles.touchArea, blinking && allowed && styles.blinkTouchArea]}>
+    <Pressable onPress={() => {
+      if (!active) return;
+      setResponse({ state, text: NIMBO_EMOTIONS[state].response });
+      if (happyLoaded) motion.tap();
+    }} accessibilityRole="button" accessibilityLabel="Pet Nimbo" accessibilityHint="Show Nimbo’s response to a gentle pat" style={[styles.touchArea, blinking && allowed && styles.blinkTouchArea]}>
       <Animated.View testID="nimbo-motion" accessible accessibilityRole="image" accessibilityLabel={label} style={[styles.imageMask, blinking && styles.blinkMask, motion.animatedStyle]}>
         {allowed ? sequence.frames.map((asset, i) => <Image
           key={sequenceKey + ':' + i} testID={'nimbo-frame-' + i} source={asset}
@@ -94,6 +105,7 @@ function RasterNimbo({ reviewKit = false, reviewState, reviewReduced = false, re
       </Animated.View>
     </Pressable>
     <Text style={styles.stateText}>{state}</Text>
+    {active && response?.state === state && <Text accessibilityLiveRegion="polite" style={styles.response}>{response.text}</Text>}
     {__DEV__ && reviewKit && <>
       <Text testID="nimbo-playback">{allowed ? `${blinking ? 'Blink · ' : ''}${playing ? 'Playing' : 'Paused'} · frame ${index + 1}` : 'Static state artwork · legacy loops disabled'}{reduced ? ' · reduced motion' : ''}</Text>
       <Text testID="nimbo-motion-status">{walkingPending ? 'Walking: awaiting approved artwork' : state === 'EATING' ? 'Static eating pose · chewing awaits artwork' : motion.moving ? 'Whole-character motion active' : 'Motion paused'} · tap {motion.tapPhase}</Text>
@@ -102,12 +114,13 @@ function RasterNimbo({ reviewKit = false, reviewState, reviewReduced = false, re
 }
 const styles = StyleSheet.create({
   stage: {
-    height: 240,
+    minHeight: 280,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
+  response: { color: '#43365c', textAlign: 'center', paddingHorizontal: 12, paddingVertical: 8, maxWidth: 360 },
   touchArea: {
     padding: 20,
     alignItems: 'center',
@@ -130,8 +143,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
-  blinkStage: { height: 250 },
-  reviewStage: { height: 310 },
+  blinkStage: { minHeight: 290 },
+  reviewStage: { minHeight: 360 },
   blinkTouchArea: { padding: 0 },
   blinkMask: { width: 240, height: 197 },
   blinkImage: { width: 240, height: 197 },

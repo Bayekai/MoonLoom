@@ -52,4 +52,24 @@ describe('Nimbo user action timing', () => {
     jest.runAllTimers();
     expect(nimboController.getState()).toBe('HAPPY');
   });
+
+  it.each(['play', 'comfort', 'encourage'] as const)('%s returns to the previous emotion without spending food', kind => {
+    nimboController.setState('STRESSED');
+    expect(nimboActions.interact(kind)).toBe(true);
+    expect(useStore.getState().profile.foodBalance).toBe(3);
+    expect(useStore.getState().isSleeping).toBe(false);
+    jest.runAllTimers();
+    expect(nimboController.getState()).toBe('STRESSED');
+  });
+
+  it('social interactions cannot interrupt sleep or feeding', () => {
+    nimboActions.sleep();
+    expect(nimboActions.interact('play')).toBe(false);
+    nimboActions.wake();
+    expect(nimboActions.interact('comfort')).toBe(false);
+    jest.runAllTimers();
+    nimboActions.feed();
+    expect(nimboActions.interact('encourage')).toBe(false);
+    expect(nimboController.getState()).toBe('EATING');
+  });
 });

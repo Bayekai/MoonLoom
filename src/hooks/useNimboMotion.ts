@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { cancelAnimation, Easing, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import type { NimboState } from '../services/nimboStateController';
 import { NimboBehavior } from '../components/NimboBehavior';
+import { NIMBO_EMOTIONS } from '../components/nimboEmotions';
 
 export type NimboTapPhase = 'none' | 'recoil' | 'happy';
 
@@ -75,6 +76,12 @@ export function useNimboMotion(state: NimboState, active: boolean, reduced: bool
     const token = generation.current;
     timers.current.forEach(clearTimeout);
     timers.current = [];
+    if (NIMBO_EMOTIONS[state].tapMotion === 'gentle') {
+      if (!reduced) {
+        rotate.value = withSequence(withTiming(1.5, { duration: 220 }), withTiming(0, { duration: 380 }));
+      }
+      return;
+    }
     setReaction({ state, phase: reduced ? 'happy' : 'recoil' });
     if (!reduced) {
       // A physical recoil is not a fabricated surprised facial expression.

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useStore } from '../store/useStore';
 import { Nimbo } from '../components/Nimbo';
@@ -7,6 +7,7 @@ import { router } from 'expo-router';
 import { WorkBreakCard } from '../components/WorkBreakCard';
 
 export default function HomeScreen() {
+  const [interactionMessage, setInteractionMessage] = useState('');
   const foodBalance = useStore(state => state.profile.foodBalance);
   const sleepSessions = useStore(state => state.sleepSessions);
   const averageSleepMs = sleepSessions.length
@@ -30,6 +31,15 @@ export default function HomeScreen() {
       <Text style={styles.header}>Moonloom</Text>
 
       <Nimbo />
+      <Text>Tap Nimbo for a response, or spend a moment together.</Text>
+      <View style={[styles.row, { gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginVertical: 12 }]}>
+        {(['play', 'comfort', 'encourage'] as const).map(kind => <TouchableOpacity key={kind} accessibilityRole="button" style={styles.button} onPress={() => {
+          const accepted = nimboActions.interact(kind);
+          setInteractionMessage(accepted ? { play: 'A little playtime together!', comfort: 'A quiet moment together.', encourage: 'One small step at a time.' }[kind] : 'Let Nimbo finish resting, waking, eating or taking a break first.');
+        }}><Text style={styles.buttonText}>{{ play: 'Play', comfort: 'Comfort', encourage: 'Encourage' }[kind]}</Text></TouchableOpacity>)}
+      </View>
+      {!!interactionMessage && <Text accessibilityLiveRegion="polite">{interactionMessage}</Text>}
+      {__DEV__ && <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/nimbo-review')} style={styles.button}><Text style={styles.buttonText}>Review all Nimbo emotions</Text></TouchableOpacity>}
       {__DEV__ && <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/nimbo-rive-review')} style={styles.button}>
         <Text style={styles.buttonText}>Rive animation preview (development)</Text>
       </TouchableOpacity>}

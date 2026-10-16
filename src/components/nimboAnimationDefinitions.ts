@@ -73,6 +73,6 @@ export function animationForState(state: NimboState): NimboAnimationId {
   if (state === 'EATING') return 'eating';
   if (state === 'SLEEPING') return 'sleeping';
   if (state === 'WAKING') return 'wake';
-  if (['HAPPY', 'ENERGETIC', 'CELEBRATING', 'IMPROVING'].includes(state)) return 'happy';
+  if (['HAPPY', 'ENERGETIC', 'PLAYING', 'CELEBRATING', 'IMPROVING'].includes(state)) return 'happy';
   return 'idle';
 }

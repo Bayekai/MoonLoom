@@ -39,6 +39,18 @@ class NimboActions {
     this.after('WAKING', () => nimboController.setState('HAPPY'));
   }
 
+  interact(kind: 'play' | 'comfort' | 'encourage') {
+    const store = useStore.getState();
+    const previous = nimboController.getState();
+    if (this.feeding || store.isSleeping || store.work.runtime.timer ||
+        ['EATING', 'SLEEPY', 'SLEEPING', 'WAKING'].includes(previous)) return false;
+    this.cancel();
+    const next = { play: 'PLAYING', comfort: 'CALM', encourage: 'ENCOURAGING' } as const;
+    nimboController.setState(next[kind]);
+    this.after(next[kind], () => nimboController.setState(previous));
+    return true;
+  }
+
   feed() {
     const store = useStore.getState();
     if (this.feeding || store.isSleeping || store.profile.foodBalance < 1) return false;
