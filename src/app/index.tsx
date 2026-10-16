@@ -2,42 +2,27 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useStore } from '../store/useStore';
 import { Nimbo } from '../components/Nimbo';
-import { nimboController } from '../services/nimboStateController';
-import { SleepTrackerService } from '../services/sleepTracker';
+import { nimboActions } from '../services/nimboActions';
 import { router } from 'expo-router';
 import { WorkBreakCard } from '../components/WorkBreakCard';
 
 export default function HomeScreen() {
   const foodBalance = useStore(state => state.profile.foodBalance);
   const sleepSessions = useStore(state => state.sleepSessions);
+  const averageSleepMs = sleepSessions.length
+    ? sleepSessions.reduce((total, session) => total + session.durationMs, 0) / sleepSessions.length : 0;
+  const isSleeping = useStore(state => state.isSleeping);
 
   const simulateGoingToSleep = () => {
-    useStore.getState().setSleeping(true);
-    nimboController.setState('SLEEPY');
-    setTimeout(() => {
-      nimboController.setState('SLEEPING');
-    }, 2000);
+    nimboActions.sleep();
   };
 
   const simulateWakeUp = () => {
-    useStore.getState().setSleeping(false);
-    nimboController.setState('WAKING');
-    setTimeout(() => {
-      nimboController.setState('HAPPY'); // In real app, derived from sleep logic
-    }, 2000);
+    nimboActions.wake();
   };
 
   const feedNimbo = () => {
-    if (foodBalance > 0) {
-      const currentState = nimboController.getState();
-      useStore.getState().addFood(-1);
-      nimboController.setState('EATING');
-
-      setTimeout(() => {
-        nimboController.setState('HAPPY');
-        setTimeout(() => nimboController.setState(currentState), 2000);
-      }, 2000);
-    }
+    nimboActions.feed();
   };
 
   return (
@@ -52,7 +37,7 @@ export default function HomeScreen() {
 
       <View style={styles.statsCard}>
         <Text style={styles.statsText}>Dry Food: {foodBalance}</Text>
-        <Text style={styles.statsText}>Avg Sleep: {(SleepTrackerService.getAverageDurationMs() / (1000 * 60 * 60)).toFixed(1)} hrs</Text>
+        <Text style={styles.statsText}>Avg Sleep: {(averageSleepMs / (1000 * 60 * 60)).toFixed(1)} hrs</Text>
       </View>
 
       <View style={styles.buttonContainer}>
@@ -74,7 +59,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={[styles.button, foodBalance <= 0 && styles.buttonDisabled]} onPress={feedNimbo} disabled={foodBalance <= 0}>
+        <TouchableOpacity style={[styles.button, (foodBalance <= 0 || isSleeping) && styles.buttonDisabled]} onPress={feedNimbo} disabled={foodBalance <= 0 || isSleeping}>
           <Text style={styles.buttonText}>Feed Nimbo (Cost: 1 Food)</Text>
         </TouchableOpacity>
       </View>

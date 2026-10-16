@@ -12,30 +12,23 @@ export default function LogScreen() {
   const [rating, setRating] = useState('Okay');
   const [lifestyleType, setLifestyleType] = useState('');
   const [lifestyleVal, setLifestyleVal] = useState('');
+  const [sleepMessage, setSleepMessage] = useState('');
 
   const handleLogSleep = () => {
-    // Basic string parse for demo MVP
-    const today = new Date();
-    const [bHours, bMins] = bedtime.split(':');
-    const bedDate = new Date(today);
-    bedDate.setHours(parseInt(bHours), parseInt(bMins), 0);
-    // If bedtime is after noon, assume it was yesterday
-    if (parseInt(bHours) > 12) {
-        bedDate.setDate(bedDate.getDate() - 1);
+    try {
+      const interval = SleepTrackerService.manualInterval(bedtime, wakeTime);
+      SleepTrackerService.logSleep(interval.bedtime, interval.wakeTime, rating);
+    } catch (error) {
+      setSleepMessage(error instanceof Error ? error.message : 'Unable to log sleep.');
+      return;
     }
-
-    const [wHours, wMins] = wakeTime.split(':');
-    const wakeDate = new Date(today);
-    wakeDate.setHours(parseInt(wHours), parseInt(wMins), 0);
-
-    SleepTrackerService.logSleep(bedDate.toISOString(), wakeDate.toISOString());
 
     // Map rating to Nimbo state
     if (rating === 'Excellent' || rating === 'Good') nimboController.setState('ENERGETIC');
     if (rating === 'Okay') nimboController.setState('HAPPY');
     if (rating === 'Tired' || rating === 'Exhausted') nimboController.setState('TIRED');
 
-    Alert.alert("Sleep Logged", `Logged sleep and awarded Dry Food.`);
+    setSleepMessage('Sleep logged. Awarded 2 Dry Food.');
   };
 
   const handleLogLifestyle = () => {
@@ -60,6 +53,7 @@ export default function LogScreen() {
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Log Sleep</Text>
+        <Text>Times describe your most recent completed sleep.</Text>
         <Text style={styles.label}>Bedtime (HH:MM)</Text>
         <TextInput style={styles.input} value={bedtime} onChangeText={setBedtime} />
 
@@ -82,6 +76,7 @@ export default function LogScreen() {
         <TouchableOpacity style={styles.btn} onPress={handleLogSleep}>
             <Text style={styles.btnText}>Log Sleep</Text>
         </TouchableOpacity>
+        {!!sleepMessage && <Text accessibilityRole="alert">{sleepMessage}</Text>}
       </View>
 
       <View style={styles.card}>

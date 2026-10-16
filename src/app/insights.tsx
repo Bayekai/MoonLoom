@@ -1,10 +1,13 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { useStore } from '../store/useStore';
 import { ExperimentEngine } from '../services/experimentEngine';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearMoonloomData } from '../services/privacy';
 
 export default function InsightsScreen() {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const experiments = useStore(state => state.experiments);
   const memoryCount = useStore(state => state.aiMemory.length);
   const sleepCount = useStore(state => state.sleepSessions.length);
@@ -13,24 +16,17 @@ export default function InsightsScreen() {
     ExperimentEngine.startExperiment("No screens 30m before bed", 7);
   };
 
-  const handleClearData = () => {
-    Alert.alert(
-      "Clear All Data",
-      "This will permanently delete all your offline sleep data, AI memory, and Nimbo progress. Continue?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            await AsyncStorage.clear();
-            // Reset zustand
-            useStore.persist.clearStorage();
-            Alert.alert("Data Cleared", "Please restart the app.");
-          }
-        }
-      ]
-    );
+  const handleClearData = async () => {
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      await clearMoonloomData();
+      setConfirmDelete(false);
+    } catch {
+      setDeleteError('Could not finish clearing data. Please try again.');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -64,10 +60,21 @@ export default function InsightsScreen() {
       <View style={[styles.card, {borderColor: '#ef4444', borderWidth: 1}]}>
         <Text style={[styles.cardTitle, {color: '#ef4444'}]}>Privacy Controls</Text>
         <Text style={{marginBottom: 15, color: '#64748b'}}>Moonloom stores data locally. You control your data.</Text>
-        <TouchableOpacity style={[styles.actionBtn, {backgroundColor: '#ef4444'}]} onPress={handleClearData}>
+        <TouchableOpacity style={[styles.actionBtn, {backgroundColor: '#ef4444'}]} onPress={() => setConfirmDelete(true)}>
           <Text style={styles.actionText}>Delete All Local Data</Text>
         </TouchableOpacity>
       </View>
+      <Modal visible={confirmDelete} transparent onRequestClose={() => { if (!deleting) setConfirmDelete(false); }}>
+        <View style={{ flex: 1, backgroundColor: '#0008', justifyContent: 'center', padding: 24 }}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Clear All Data</Text>
+            <Text>This permanently deletes your local sleep data, AI memory, work schedule and Nimbo progress.</Text>
+            {!!deleteError && <Text accessibilityRole="alert">{deleteError}</Text>}
+            <TouchableOpacity accessibilityRole="button" disabled={deleting} style={styles.actionBtn} onPress={() => setConfirmDelete(false)}><Text style={styles.actionText}>Cancel</Text></TouchableOpacity>
+            <TouchableOpacity accessibilityRole="button" disabled={deleting} style={[styles.actionBtn, { backgroundColor: '#ef4444' }]} onPress={handleClearData}><Text style={styles.actionText}>{deleting ? 'Deleting…' : 'Delete permanently'}</Text></TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
